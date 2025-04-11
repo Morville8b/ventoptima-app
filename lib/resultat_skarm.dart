@@ -17,7 +17,6 @@ class ResultatSkarm extends StatelessWidget {
   final String varmegenvindingstype;
   final String driftType;
   final String beregnUdFra;
-  final String renoveringsVurdering;
 
   const ResultatSkarm({
     super.key,
@@ -36,14 +35,13 @@ class ResultatSkarm extends StatelessWidget {
     required this.varmegenvindingstype,
     required this.driftType,
     required this.beregnUdFra,
-    required this.renoveringsVurdering,
   });
 
   double beregnElforbrug(double kw, double timer) => kw * timer;
 
   double beregnVirkningsgrad(double luftmaengde, double tryk, double kw) {
     if (kw == 0) return 0;
-    return ((luftmaengde / 3600) * tryk) / (kw * 1000) * 100;
+    return ((luftmaengde / 3600.0) * tryk) / (kw * 1000.0) * 100.0;
   }
 
   double beregnTemperaturReference() {
@@ -61,20 +59,42 @@ class ResultatSkarm extends StatelessWidget {
   }
 
   double beregnVarmegenvindingVirkningsgrad() {
-    if (friskluftTemp >= 10) return -1;
-
-    final delta = udsugningTemp - friskluftTemp;
+    final double delta = udsugningTemp - friskluftTemp;
     if (delta.abs() < 0.001) return -1;
-
     return beregnUdFra.toLowerCase() == "afkast"
-        ? (udsugningTemp - afkastTemp) / delta * 100
-        : (indblTempEfterGenvinding - friskluftTemp) / delta * 100;
+        ? (udsugningTemp - afkastTemp) / delta * 100.0
+        : (indblTempEfterGenvinding - friskluftTemp) / delta * 100.0;
   }
 
   double beregnVarmeforbrug() {
-    final tRef = beregnTemperaturReference();
-    final deltaT = indblTempEfterVarmeflade - tRef;
-    return (luftmaengdeInd * 1.2 * 1.006 * deltaT * driftTimer) / 3600;
+    final double tRef = beregnTemperaturReference();
+    final double deltaT = indblTempEfterVarmeflade - tRef;
+    return (luftmaengdeInd * 1.2 * 1.006 * deltaT * driftTimer) / 3600.0;
+  }
+
+  String vurderRenovering(String varmeType, double maaltVirkningsgrad) {
+    double minGraense;
+
+    String normaliser(String input) {
+      var output = input.toLowerCase();
+      output = output.replaceAll('ø', 'oe').replaceAll('æ', 'ae').replaceAll('å', 'aa');
+      output = output.replaceAll(RegExp(r'[^\w\s]'), '');
+      output = output.replaceAll(RegExp(r'\s+'), '');
+      return output;
+    }
+
+    final input = normaliser(varmeType);
+
+    if (input.contains('ingen')) minGraense = 0;
+    else if (input.contains('dobbelkryds')) minGraense = 60;
+    else if (input.contains('kryds')) minGraense = 40;
+    else if (input.contains('roterende')) minGraense = 60;
+    else if (input.contains('modstroem') || input.contains('modstroems')) minGraense = 30;
+    else if (input.contains('vaeskekoblet')) minGraense = 30;
+    else if (input.contains('blandekammer')) minGraense = 60;
+    else return 'Ukendt type';
+
+    return maaltVirkningsgrad < minGraense ? 'Ja' : 'Nej';
   }
 
   String formatNumber(double value) {
@@ -85,14 +105,27 @@ class ResultatSkarm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final elforbrugInd = beregnElforbrug(kwInd, driftTimer);
-    final elforbrugUd = beregnElforbrug(kwUd, driftTimer);
+    final double elforbrugInd = beregnElforbrug(kwInd, driftTimer);
+    final double elforbrugUd = beregnElforbrug(kwUd, driftTimer);
 
-    final virkningsgradInd = beregnVirkningsgrad(luftmaengdeInd, trykDifferensInd, kwInd);
-    final virkningsgradUd = beregnVirkningsgrad(luftmaengdeUd, trykDifferensUd, kwUd);
+    final double virkningsgradInd = beregnVirkningsgrad(luftmaengdeInd, trykDifferensInd, kwInd);
+    final double virkningsgradUd = beregnVirkningsgrad(luftmaengdeUd, trykDifferensUd, kwUd);
 
-    final varmegenvindingVirkningsgrad = beregnVarmegenvindingVirkningsgrad();
-    final varmeforbrug = beregnVarmeforbrug();
+    final bool erIndblaesning = luftmaengdeInd > 0 && luftmaengdeUd == 0;
+    final bool erUdsugning = luftmaengdeUd > 0 && luftmaengdeInd == 0;
+    final bool erVentilationsAnlaeg = luftmaengdeInd > 0 && luftmaengdeUd > 0;
+
+    final double varmegenvindingVirkningsgrad = erVentilationsAnlaeg && friskluftTemp < 10
+        ? beregnVarmegenvindingVirkningsgrad()
+        : -1;
+
+    final double varmeforbrug = erVentilationsAnlaeg && friskluftTemp < 10
+        ? beregnVarmeforbrug()
+        : -1;
+
+    final String renoveringsVurdering = erVentilationsAnlaeg && friskluftTemp < 10
+        ? vurderRenovering(varmegenvindingstype, varmegenvindingVirkningsgrad)
+        : 'Ikke relevant';
 
     return Scaffold(
       appBar: AppBar(title: const Text('Resultat - Ventilatorer og Varmegenvinding')),
@@ -141,11 +174,17 @@ class ResultatSkarm extends StatelessWidget {
             const SizedBox(height: 32),
 
             const Text('Varmegenvinding', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            Text('Beregnet ud fra: ${beregnUdFra == 'afkast' ? 'Afkasttemperatur' : 'Indblæsningstemperatur'}'),
-            Text('Virkningsgrad varmegenvinding: ${varmegenvindingVirkningsgrad < 0 ? 'Ikke beregnet' : '${formatNumber(varmegenvindingVirkningsgrad)} %'}'),
-            Text('Varmeforbrug: ${formatNumber(varmeforbrug)} kWh/år'),
-            Text('Kan varmegenvinding energioptimeres: $renoveringsVurdering',
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text('Driftperiode: $driftType'),
+            if (erVentilationsAnlaeg && friskluftTemp < 10) ...[
+              Text('Beregnet ud fra: ${beregnUdFra == 'afkast' ? 'Afkasttemperatur' : 'Indblæsningstemperatur'}'),
+              Text('Virkningsgrad varmegenvinding: ${varmegenvindingVirkningsgrad < 0 ? 'Ikke beregnet' : '${formatNumber(varmegenvindingVirkningsgrad)} %'}'),
+              Text('Varmeforbrug: ${formatNumber(varmeforbrug)} kWh/år'),
+              Text('Kan varmegenvinding energioptimeres: $renoveringsVurdering', style: const TextStyle(fontWeight: FontWeight.bold)),
+            ] else if (erIndblaesning) ...[
+              Text('Indblæsning efter varmeflade: ${formatNumber(indblTempEfterVarmeflade)} °C'),
+            ] else if (erUdsugning) ...[
+              Text('Udsugningstemperatur: ${formatNumber(udsugningTemp)} °C'),
+            ]
           ],
         ),
       ),

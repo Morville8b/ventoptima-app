@@ -62,7 +62,6 @@ class VelkomstSkarm extends StatelessWidget {
   }
 }
 
-// ✅ Kun én version af ForsideSkarm
 class ForsideSkarm extends StatefulWidget {
   const ForsideSkarm({super.key});
 
@@ -180,7 +179,7 @@ class _ForsideSkarmState extends State<ForsideSkarm> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const MaaledataSkarm(),
+                        builder: (context) => MaaledataSkarm(anlaegstype: anlaegstype),
                       ),
                     );
                   }
