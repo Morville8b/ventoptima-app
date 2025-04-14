@@ -175,16 +175,20 @@ class ResultatSkarm extends StatelessWidget {
 
             const Text('Varmegenvinding', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             Text('Driftperiode: $driftType'),
+
             if (erVentilationsAnlaeg && friskluftTemp < 10) ...[
               Text('Beregnet ud fra: ${beregnUdFra == 'afkast' ? 'Afkasttemperatur' : 'Indblæsningstemperatur'}'),
               Text('Virkningsgrad varmegenvinding: ${varmegenvindingVirkningsgrad < 0 ? 'Ikke beregnet' : '${formatNumber(varmegenvindingVirkningsgrad)} %'}'),
               Text('Varmeforbrug: ${formatNumber(varmeforbrug)} kWh/år'),
-              Text('Kan varmegenvinding energioptimeres: $renoveringsVurdering', style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                'Kan varmegenvinding energioptimeres: $renoveringsVurdering',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ] else if (erIndblaesning) ...[
               Text('Indblæsning efter varmeflade: ${formatNumber(indblTempEfterVarmeflade)} °C'),
             ] else if (erUdsugning) ...[
               Text('Udsugningstemperatur: ${formatNumber(udsugningTemp)} °C'),
-            ]
+            ],
           ],
         ),
       ),

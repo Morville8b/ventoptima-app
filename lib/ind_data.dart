@@ -1,248 +1,121 @@
+import 'generel_projekt_info.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'resultat_skarm.dart' show ResultatSkarm;
-import 'resultat_beregning.dart' show hentTemperaturTekst;
-
 class MaaledataSkarm extends StatefulWidget {
-  final String anlaegstype;
-  const MaaledataSkarm({super.key, this.anlaegstype = 'Ventilationsanlaeg'});
+  final GenerelProjektInfo projektInfo;
+
+  const MaaledataSkarm({super.key, required this.projektInfo});
 
   @override
   State<MaaledataSkarm> createState() => _MaaledataSkarmState();
 }
 
 class _MaaledataSkarmState extends State<MaaledataSkarm> {
-  final decimalFormatter = FilteringTextInputFormatter.allow(RegExp(r'^[0-9,.]*'));
+  final TextEditingController _trykFoerIndController = TextEditingController();
+  final TextEditingController _trykEfterIndController = TextEditingController();
+  final TextEditingController _trykFoerUdController = TextEditingController();
+  final TextEditingController _trykEfterUdController = TextEditingController();
+  final TextEditingController _kwIndController = TextEditingController();
+  final TextEditingController _kwUdController = TextEditingController();
+  final TextEditingController _hzIndController = TextEditingController();
+  final TextEditingController _hzUdController = TextEditingController();
+  final TextEditingController _luftmaengdeIndController = TextEditingController();
+  final TextEditingController _luftmaengdeUdController = TextEditingController();
+  final TextEditingController _kVaerdiIndController = TextEditingController();
+  final TextEditingController _trykDiffIndBeregnetController = TextEditingController();
+  final TextEditingController _kVaerdiUdController = TextEditingController();
+  final TextEditingController _trykDiffUdBeregnetController = TextEditingController();
 
-  final filterTrykIndController = TextEditingController();
-  final antalFilterIndController = TextEditingController();
-  final trykFoerIndController = TextEditingController();
-  final trykEfterIndController = TextEditingController();
-  final luftmaengdeIndController = TextEditingController();
-  final hzIndController = TextEditingController();
-  final kwIndController = TextEditingController();
-
-  final filterTrykUdController = TextEditingController();
-  final antalFilterUdController = TextEditingController();
-  final trykFoerUdController = TextEditingController();
-  final trykEfterUdController = TextEditingController();
-  final luftmaengdeUdController = TextEditingController();
-  final hzUdController = TextEditingController();
-  final kwUdController = TextEditingController();
-
-  final mandagController = TextEditingController();
-  final tirsdagController = TextEditingController();
-  final onsdagController = TextEditingController();
-  final torsdagController = TextEditingController();
-  final fredagController = TextEditingController();
-  final loerdagController = TextEditingController();
-  final soendagController = TextEditingController();
-  final ugerController = TextEditingController(text: '52');
-
-  final friskluftController = TextEditingController();
-  final indblEfterGenvindingController = TextEditingController();
-  final indblEfterVarmefladeController = TextEditingController();
-  final udsugningTempController = TextEditingController();
-  final afkastTempController = TextEditingController();
-
-  String varmegenvindingstype = 'Krydsveksler';
-  String driftperiode = 'Dagtimer';
-  String beregnUdFra = 'indblaesning';
-  bool erFriskluftOpvarmet = false;
+  bool _beregnUdFraKVaerdi = false;
 
   @override
   void dispose() {
-    for (var controller in [
-      filterTrykIndController,
-      antalFilterIndController,
-      trykFoerIndController,
-      trykEfterIndController,
-      luftmaengdeIndController,
-      hzIndController,
-      kwIndController,
-      filterTrykUdController,
-      antalFilterUdController,
-      trykFoerUdController,
-      trykEfterUdController,
-      luftmaengdeUdController,
-      hzUdController,
-      kwUdController,
-      mandagController,
-      tirsdagController,
-      onsdagController,
-      torsdagController,
-      fredagController,
-      loerdagController,
-      soendagController,
-      ugerController,
-      friskluftController,
-      indblEfterGenvindingController,
-      indblEfterVarmefladeController,
-      udsugningTempController,
-      afkastTempController,
-    ]) {
-      controller.dispose();
-    }
+    _trykFoerIndController.dispose();
+    _trykEfterIndController.dispose();
+    _trykFoerUdController.dispose();
+    _trykEfterUdController.dispose();
+    _kwIndController.dispose();
+    _kwUdController.dispose();
+    _hzIndController.dispose();
+    _hzUdController.dispose();
+    _luftmaengdeIndController.dispose();
+    _luftmaengdeUdController.dispose();
+    _kVaerdiIndController.dispose();
+    _trykDiffIndBeregnetController.dispose();
+    _kVaerdiUdController.dispose();
+    _trykDiffUdBeregnetController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final visIndblaesning = widget.anlaegstype == 'Indblaesningsanlaeg' || widget.anlaegstype == 'Ventilationsanlaeg';
-    final visUdsugning = widget.anlaegstype == 'Udsugningsanlaeg' || widget.anlaegstype == 'Ventilationsanlaeg';
-    final temperaturSwitchLabel = hentTemperaturTekst(widget.anlaegstype);
-
     return Scaffold(
       appBar: AppBar(title: const Text('Måledata')),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 24),
-            if (visIndblaesning) ...[
-              const Text('Indblæsningsventilator', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              TextFormField(controller: filterTrykIndController, decoration: const InputDecoration(labelText: 'Tryk før filterudskiftning (Pa)')),
-              TextFormField(controller: antalFilterIndController, decoration: const InputDecoration(labelText: 'Antal filtre')),
-              TextFormField(controller: trykFoerIndController, decoration: const InputDecoration(labelText: 'Tryk før ventilator (Pa)')),
-              TextFormField(controller: trykEfterIndController, decoration: const InputDecoration(labelText: 'Tryk efter ventilator (Pa)')),
-              TextFormField(controller: luftmaengdeIndController, decoration: const InputDecoration(labelText: 'Luftmængde (m³/h)')),
-              TextFormField(controller: hzIndController, decoration: const InputDecoration(labelText: 'Hz')),
-              TextFormField(controller: kwIndController, decoration: const InputDecoration(labelText: 'kW')),
-              const SizedBox(height: 24),
-            ],
-            if (visUdsugning) ...[
-              const Text('Udsugningsventilator', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              TextFormField(controller: filterTrykUdController, decoration: const InputDecoration(labelText: 'Tryk før filterudskiftning (Pa)')),
-              TextFormField(controller: antalFilterUdController, decoration: const InputDecoration(labelText: 'Antal filtre')),
-              TextFormField(controller: trykFoerUdController, decoration: const InputDecoration(labelText: 'Tryk før ventilator (Pa)')),
-              TextFormField(controller: trykEfterUdController, decoration: const InputDecoration(labelText: 'Tryk efter ventilator (Pa)')),
-              TextFormField(controller: luftmaengdeUdController, decoration: const InputDecoration(labelText: 'Luftmængde (m³/h)')),
-              TextFormField(controller: hzUdController, decoration: const InputDecoration(labelText: 'Hz')),
-              TextFormField(controller: kwUdController, decoration: const InputDecoration(labelText: 'kW')),
-              const SizedBox(height: 24),
-            ],
-            const Text('Driftstimer pr. dag (mandag–søndag)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            TextFormField(controller: mandagController, decoration: const InputDecoration(labelText: 'Mandag (timer)')),
-            TextFormField(controller: tirsdagController, decoration: const InputDecoration(labelText: 'Tirsdag (timer)')),
-            TextFormField(controller: onsdagController, decoration: const InputDecoration(labelText: 'Onsdag (timer)')),
-            TextFormField(controller: torsdagController, decoration: const InputDecoration(labelText: 'Torsdag (timer)')),
-            TextFormField(controller: fredagController, decoration: const InputDecoration(labelText: 'Fredag (timer)')),
-            TextFormField(controller: loerdagController, decoration: const InputDecoration(labelText: 'Lørdag (timer)')),
-            TextFormField(controller: soendagController, decoration: const InputDecoration(labelText: 'Søndag (timer)')),
-            TextFormField(controller: ugerController, decoration: const InputDecoration(labelText: 'Antal uger pr. år')),
-            const SizedBox(height: 24),
-            const Text('Varmegenvinding og temperaturer', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SwitchListTile(
-              title: Text(temperaturSwitchLabel),
-              value: erFriskluftOpvarmet,
-              onChanged: (val) => setState(() => erFriskluftOpvarmet = val),
-            ),
-            if (erFriskluftOpvarmet) ...[
-              if (widget.anlaegstype == 'Indblaesningsanlaeg') ...[
-                DropdownButtonFormField<String>(
-                  value: driftperiode,
-                  decoration: const InputDecoration(labelText: 'Anlæggets driftperiode'),
-                  items: const [
-                    DropdownMenuItem(value: 'Dagtimer', child: Text('Dagtimer')),
-                    DropdownMenuItem(value: 'Nattetimer', child: Text('Nattetimer')),
-                    DropdownMenuItem(value: 'Døgn', child: Text('Døgndrift')),
-                  ],
-                  onChanged: (val) => setState(() => driftperiode = val!),
-                ),
-                TextFormField(controller: indblEfterVarmefladeController, decoration: const InputDecoration(labelText: 'Indblæsning efter varmeflade (°C)')),
-              ] else if (widget.anlaegstype == 'Udsugningsanlaeg') ...[
-                DropdownButtonFormField<String>(
-                  value: driftperiode,
-                  decoration: const InputDecoration(labelText: 'Anlæggets driftperiode'),
-                  items: const [
-                    DropdownMenuItem(value: 'Dagtimer', child: Text('Dagtimer')),
-                    DropdownMenuItem(value: 'Nattetimer', child: Text('Nattetimer')),
-                    DropdownMenuItem(value: 'Døgn', child: Text('Døgndrift')),
-                  ],
-                  onChanged: (val) => setState(() => driftperiode = val!),
-                ),
-                TextFormField(controller: udsugningTempController, decoration: const InputDecoration(labelText: 'Udsugningstemperatur (°C)')),
-              ] else if (widget.anlaegstype == 'Ventilationsanlaeg') ...[
-                DropdownButtonFormField<String>(
-                  value: driftperiode,
-                  decoration: const InputDecoration(labelText: 'Anlæggets driftperiode'),
-                  items: const [
-                    DropdownMenuItem(value: 'Dagtimer', child: Text('Dagtimer')),
-                    DropdownMenuItem(value: 'Nattetimer', child: Text('Nattetimer')),
-                    DropdownMenuItem(value: 'Døgn', child: Text('Døgndrift')),
-                  ],
-                  onChanged: (val) => setState(() => driftperiode = val!),
-                ),
-                DropdownButtonFormField<String>(
-                  value: varmegenvindingstype,
-                  decoration: const InputDecoration(labelText: 'Varmegenvindingstype'),
-                  items: const [
-                    DropdownMenuItem(value: 'Ingen', child: Text('Ingen')),
-                    DropdownMenuItem(value: 'Krydsveksler', child: Text('Krydsveksler')),
-                    DropdownMenuItem(value: 'Dobbel krydsveksler', child: Text('Dobbel krydsveksler')),
-                    DropdownMenuItem(value: 'Roterendeveksler', child: Text('Roterendeveksler')),
-                    DropdownMenuItem(value: 'Modstrømveksler', child: Text('Modstrømveksler')),
-                    DropdownMenuItem(value: 'Væskekobletveksler', child: Text('Væskekobletveksler')),
-                    DropdownMenuItem(value: 'Blandekammer', child: Text('Blandekammer')),
-                  ],
-                  onChanged: (val) => setState(() => varmegenvindingstype = val!),
-                ),
-                DropdownButtonFormField<String>(
-                  value: beregnUdFra,
-                  decoration: const InputDecoration(labelText: 'Beregn varmegenvinding ud fra'),
-                  items: const [
-                    DropdownMenuItem(value: 'indblaesning', child: Text('Indblæsningstemperatur')),
-                    DropdownMenuItem(value: 'afkast', child: Text('Afkasttemperatur')),
-                  ],
-                  onChanged: (val) => setState(() => beregnUdFra = val!),
-                ),
-                TextFormField(controller: friskluftController, decoration: const InputDecoration(labelText: 'Frisklufttemperatur (°C)')),
-                TextFormField(controller: indblEfterGenvindingController, decoration: const InputDecoration(labelText: 'Indblæsning efter varmegenvinding (°C)')),
-                TextFormField(controller: indblEfterVarmefladeController, decoration: const InputDecoration(labelText: 'Indblæsning efter varmeflade (°C)')),
-                TextFormField(controller: udsugningTempController, decoration: const InputDecoration(labelText: 'Udsugningstemperatur (°C)')),
-                TextFormField(controller: afkastTempController, decoration: const InputDecoration(labelText: 'Afkasttemperatur (°C)')),
-              ],
-            ],
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                final driftTimer = [
-                  mandagController,
-                  tirsdagController,
-                  onsdagController,
-                  torsdagController,
-                  fredagController,
-                  loerdagController,
-                  soendagController,
-                ].map((c) => double.tryParse(c.text.replaceAll(',', '.')) ?? 0).reduce((a, b) => a + b) *
-                    (double.tryParse(ugerController.text.replaceAll(',', '.')) ?? 52);
+            Text('Kunde: ${widget.projektInfo.kundeNavn}'),
+            Text('Adresse: ${widget.projektInfo.adresse}'),
+            Text('Postnr/By: ${widget.projektInfo.postnrBy}'),
+            Text('Att: ${widget.projektInfo.att}'),
+            const SizedBox(height: 16),
+            const Text('Teknikeroplysninger:', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('Navn: ${widget.projektInfo.teknikerNavn}'),
+            Text('Telefon: ${widget.projektInfo.telefon}'),
+            Text('E-mail: ${widget.projektInfo.email}'),
+            const SizedBox(height: 16),
+            const Text('Projektoplysninger:', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('Antal anlæg: ${widget.projektInfo.antalAnlaeg}'),
+            Text('Elpris: ${widget.projektInfo.elPris} kr/kWh'),
+            Text('Varmepris: ${widget.projektInfo.varmePris} kr/kWh'),
+            Text('Uger per år: ${widget.projektInfo.ugerPerAar}'),
+            Text('Driftperiode: ${widget.projektInfo.driftperiode}'),
+            const SizedBox(height: 16),
+            const Text('Drifttimer pr. uge:', style: TextStyle(fontWeight: FontWeight.bold)),
+            for (int i = 0; i < widget.projektInfo.driftTimerPrUge.length; i++)
+              Text('Dag ${i + 1}: ${widget.projektInfo.driftTimerPrUge[i]} timer'),
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ResultatSkarm(
-                      kwInd: double.tryParse(kwIndController.text.replaceAll(',', '.')) ?? 0,
-                      luftmaengdeInd: double.tryParse(luftmaengdeIndController.text.replaceAll(',', '.')) ?? 0,
-                      trykDifferensInd: (double.tryParse(trykEfterIndController.text.replaceAll(',', '.')) ?? 0) - (double.tryParse(trykFoerIndController.text.replaceAll(',', '.')) ?? 0),
-                      kwUd: double.tryParse(kwUdController.text.replaceAll(',', '.')) ?? 0,
-                      luftmaengdeUd: double.tryParse(luftmaengdeUdController.text.replaceAll(',', '.')) ?? 0,
-                      trykDifferensUd: (double.tryParse(trykEfterUdController.text.replaceAll(',', '.')) ?? 0) - (double.tryParse(trykFoerUdController.text.replaceAll(',', '.')) ?? 0),
-                      driftTimer: driftTimer,
-                      friskluftTemp: double.tryParse(friskluftController.text.replaceAll(',', '.')) ?? 0,
-                      indblTempEfterGenvinding: double.tryParse(indblEfterGenvindingController.text.replaceAll(',', '.')) ?? 0,
-                      indblTempEfterVarmeflade: double.tryParse(indblEfterVarmefladeController.text.replaceAll(',', '.')) ?? 0,
-                      afkastTemp: double.tryParse(afkastTempController.text.replaceAll(',', '.')) ?? 0,
-                      udsugningTemp: double.tryParse(udsugningTempController.text.replaceAll(',', '.')) ?? 0,
-                      varmegenvindingstype: varmegenvindingstype,
-                      driftType: driftperiode,
-                      beregnUdFra: beregnUdFra,
-                    ),
-                  ),
-                );
-              },
-              child: const Text('Beregn'),
-            )
+            const SizedBox(height: 24),
+            const Text('Ventilatordata – Indblæsning', style: TextStyle(fontWeight: FontWeight.bold)),
+            TextField(controller: _trykFoerIndController, decoration: const InputDecoration(labelText: 'Tryk før ventilator (Pa)')),
+            TextField(controller: _trykEfterIndController, decoration: const InputDecoration(labelText: 'Tryk efter ventilator (Pa)')),
+            TextField(controller: _kwIndController, decoration: const InputDecoration(labelText: 'Effekt (kW)')),
+            TextField(controller: _hzIndController, decoration: const InputDecoration(labelText: 'Driftfrekvens (Hz)')),
+
+            const SizedBox(height: 24),
+            const Text('Ventilatordata – Udsugning', style: TextStyle(fontWeight: FontWeight.bold)),
+            TextField(controller: _trykFoerUdController, decoration: const InputDecoration(labelText: 'Tryk før ventilator (Pa)')),
+            TextField(controller: _trykEfterUdController, decoration: const InputDecoration(labelText: 'Tryk efter ventilator (Pa)')),
+            TextField(controller: _kwUdController, decoration: const InputDecoration(labelText: 'Effekt (kW)')),
+            TextField(controller: _hzUdController, decoration: const InputDecoration(labelText: 'Driftfrekvens (Hz)')),
+
+            const SizedBox(height: 24),
+            const Text('Luftmængde', style: TextStyle(fontWeight: FontWeight.bold)),
+            TextField(controller: _luftmaengdeIndController, decoration: const InputDecoration(labelText: 'Indblæsning målt (m³/h)')),
+            TextField(controller: _luftmaengdeUdController, decoration: const InputDecoration(labelText: 'Udsugning målt (m³/h)')),
+
+            SwitchListTile(
+              title: const Text('Beregn ud fra K-værdi og trykdifferens?'),
+              value: _beregnUdFraKVaerdi,
+              onChanged: (val) => setState(() => _beregnUdFraKVaerdi = val),
+            ),
+            if (_beregnUdFraKVaerdi) ...[
+              TextField(controller: _kVaerdiIndController, decoration: const InputDecoration(labelText: 'K-værdi indblæsning')),
+              TextField(controller: _trykDiffIndBeregnetController, decoration: const InputDecoration(labelText: 'Trykdifferens (Pa)')),
+              TextField(controller: _kVaerdiUdController, decoration: const InputDecoration(labelText: 'K-værdi udsugning')),
+              TextField(controller: _trykDiffUdBeregnetController, decoration: const InputDecoration(labelText: 'Trykdifferens (Pa)')),
+            ],
+
+            const SizedBox(height: 32),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  // Tilføj navigering eller beregning her
+                },
+                child: const Text('Beregn'),
+              ),
+            ),
           ],
         ),
       ),
