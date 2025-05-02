@@ -1,213 +1,487 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
+
+import 'package:ventoptima/widgets/vis_dokumentation_dialog.dart';
+
+import 'anlaegs_data.dart';
 import 'generel_projekt_info.dart';
+import 'indberetning_skarm.dart';
+import 'inddata_ventilator.dart';
+import 'inddata_luftmaengde.dart';
+import 'inddata_varmegenvindning.dart';
+
 
 class MaaledataSkarm extends StatefulWidget {
-  final GenerelProjektInfo projektInfo;
+    final GenerelProjektInfo projektInfo;
 
-  const MaaledataSkarm({super.key, required this.projektInfo});
+    const MaaledataSkarm({super.key, required this.projektInfo});
 
-  @override
-  State<MaaledataSkarm> createState() => _MaaledataSkarmState();
-}
+    @override
+    State<MaaledataSkarm> createState() => _MaaledataSkarmState();
+    }
 
-class _MaaledataSkarmState extends State<MaaledataSkarm> {
-  final TextEditingController _trykFoerIndController = TextEditingController();
-  final TextEditingController _trykEfterIndController = TextEditingController();
-  final TextEditingController _trykFoerUdController = TextEditingController();
-  final TextEditingController _trykEfterUdController = TextEditingController();
-  final TextEditingController _kwIndController = TextEditingController();
-  final TextEditingController _kwUdController = TextEditingController();
-  final TextEditingController _hzIndController = TextEditingController();
-  final TextEditingController _hzUdController = TextEditingController();
-  final TextEditingController _luftmaengdeIndController = TextEditingController();
-  final TextEditingController _luftmaengdeUdController = TextEditingController();
-  final TextEditingController _hzMaxIndController = TextEditingController();
-  final TextEditingController _hzMaxUdController = TextEditingController();
-  final TextEditingController _tempUdeController = TextEditingController();
-  final TextEditingController _tempEfterVarmegenvindingController = TextEditingController();
-  final TextEditingController _tempEfterVarmefladeController = TextEditingController();
-  final TextEditingController _tempUdsugningController = TextEditingController();
-  final TextEditingController _afkastTempController = TextEditingController();
+        class _MaaledataSkarmState extends State<MaaledataSkarm> {
+        bool _visKVaerdiBeregningInd = false;
+        bool _visEffektBeregningInd = false;
+        bool _visKVaerdiBeregningUd = false;
+        bool _visEffektBeregningUd = false;
+        bool _visVarmegenvinding = false;
+        bool _beregnUdFraIndblaesning = true;
 
-  bool _visBeregnVed50HzInd = false;
-  bool _visBeregnVed50HzUd = false;
-  bool _visVarmegenvinding = false;
-  bool _brugAfkast = false;
-  String _valgtType = 'Kryds';
-  final List<String> _typer = ['Kryds', 'Dobbelkryds', 'Roterende', 'Modstrøm', 'Væskekoblet', 'Blandekammer'];
+        String _valgtAnlaegstype = 'Ventilationsanlæg';
 
-  String _valgtAnlaegstype = 'Ventilationsanlæg';
-  final List<String> _anlaegstyper = ['Ventilationsanlæg', 'Indblæsningsanlæg', 'Udsugningsanlæg'];
+        final TextEditingController _anlaegsNavnController = TextEditingController();
+        final TextEditingController _ventMaerkatNrController = TextEditingController();
+        final TextEditingController _tFriskController = TextEditingController();
+        final TextEditingController _tIndController = TextEditingController();
+        final TextEditingController _tAfkastController = TextEditingController();
+        final TextEditingController _tUdController = TextEditingController();
 
-  @override
-  void dispose() {
-    _trykFoerIndController.dispose();
-    _trykEfterIndController.dispose();
-    _trykFoerUdController.dispose();
-    _trykEfterUdController.dispose();
-    _kwIndController.dispose();
-    _kwUdController.dispose();
-    _hzIndController.dispose();
-    _hzUdController.dispose();
-    _luftmaengdeIndController.dispose();
-    _luftmaengdeUdController.dispose();
-    _hzMaxIndController.dispose();
-    _hzMaxUdController.dispose();
-    _tempUdeController.dispose();
-    _tempEfterVarmegenvindingController.dispose();
-    _tempEfterVarmefladeController.dispose();
-    _tempUdsugningController.dispose();
-    _afkastTempController.dispose();
-    super.dispose();
-  }
+        final TextEditingController _hzIndController = TextEditingController();
+        final TextEditingController _hzUdController = TextEditingController();
 
-  double _beregnLuftmaengdeVed50Hz(double luftmaengde, double hz) {
-    if (hz <= 0) return 0;
-    return luftmaengde * pow((50 / hz), 3);
-  }
+        final TextEditingController _trykGamleFiltreInd = TextEditingController();
+        final TextEditingController _antalFiltreInd = TextEditingController();
+        final TextEditingController _trykFoerInd = TextEditingController();
+        final TextEditingController _trykEfterInd = TextEditingController();
+        final TextEditingController _effektInd = TextEditingController();
 
-  @override
-  Widget build(BuildContext context) {
-    final double? udetemp = double.tryParse(_tempUdeController.text.replaceAll(',', '.'));
-    final bool udetempOver10 = udetemp != null && udetemp > 10;
-    final bool erVentilationsanlaeg = _valgtAnlaegstype == 'Ventilationsanlæg';
-    final bool erIndblaesningsanlaeg = _valgtAnlaegstype == 'Indblæsningsanlæg';
-    final bool erUdsugningsanlaeg = _valgtAnlaegstype == 'Udsugningsanlæg';
+        final TextEditingController _trykGamleFiltreUd = TextEditingController();
+        final TextEditingController _antalFiltreUd = TextEditingController();
+        final TextEditingController _trykFoerUd = TextEditingController();
+        final TextEditingController _trykEfterUd = TextEditingController();
+        final TextEditingController _effektUd = TextEditingController();
 
-    String varmegenvindingLabel = erUdsugningsanlaeg
-        ? 'Er udsugningsluften opvarmet?'
-        : 'Er indblæsningsluften opvarmet?';
+        final TextEditingController _luftMaaltIndController = TextEditingController();
+        final TextEditingController _kVaerdiIndController = TextEditingController();
+        final TextEditingController _trykDifferensIndController = TextEditingController();
+        final TextEditingController _maksLuftIndController = TextEditingController();
+        final TextEditingController _maksEffektIndController = TextEditingController();
+        final TextEditingController _effektMaaltIndController = TextEditingController();
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Måledata')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        final TextEditingController _luftMaaltUdController = TextEditingController();
+        final TextEditingController _kVaerdiUdController = TextEditingController();
+        final TextEditingController _trykDifferensUdController = TextEditingController();
+        final TextEditingController _maksLuftUdController = TextEditingController();
+        final TextEditingController _maksEffektUdController = TextEditingController();
+        final TextEditingController _effektMaaltUdController = TextEditingController();
+
+        // Grøn farve, der matcher logoet
+        final Color _matchingGreen = Color(0xFF34E0A1); // Farven HEX #34E0A1
+
+        // Blå farve
+        final Color _matchingBlue = Color(0xFF006390); // Farven HEX #006390
+
+        void _visBilledeBeskrivelsePopup() async {
+            final bool? vilFortsaette = await visDokumentationsDialog(context);
+
+            if (vilFortsaette == true) {
+            Navigator.push(
+            context,
+            MaterialPageRoute(
+            builder: (context) => IndberetningSkarm(
+            onGemOgNaeste: () => Navigator.pop(context),
+            projektInfo: widget.projektInfo,
+            ),
+            ),
+            );
+            }
+        }
+
+        @override
+        Widget build(BuildContext context) {
+        final double hzInd = double.tryParse(_hzIndController.text.replaceAll(',', '.')) ?? 0;
+        final double hzUd = double.tryParse(_hzUdController.text.replaceAll(',', '.')) ?? 0;
+
+        return Scaffold(
+        body: Stack(
+        children: [
+        SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Anlægstype', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            DropdownButtonFormField<String>(
-              value: _valgtAnlaegstype,
-              decoration: const InputDecoration(labelText: 'Vælg anlægstype'),
-              items: _anlaegstyper.map((type) => DropdownMenuItem(value: type, child: Text(type))).toList(),
-              onChanged: (val) => setState(() => _valgtAnlaegstype = val!),
-            ),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+        const SizedBox(height: 100),
+        _sektionTitel('STAMDATA'),
+        AnlaegsdataWidget(
+        anlaegsNavnController: _anlaegsNavnController,
+        ventMaerkatNrController: _ventMaerkatNrController,
+        valgtAnlaegstype: _valgtAnlaegstype,
+        onAnlaegstypeChanged: (val) => setState(() => _valgtAnlaegstype = val!),
+        ),
+        const Divider(height: 32),
+        _sektionTitel('VENTILATORER'),
+        VentilatorVisning(
+        anlaegstype: _valgtAnlaegstype,
+        trykGamleFiltreIndController: _trykGamleFiltreInd,
+        antalFiltreIndController: _antalFiltreInd,
+        trykFoerIndController: _trykFoerInd,
+        trykEfterIndController: _trykEfterInd,
+        hzIndController: _hzIndController,
+        effektIndController: _effektInd,
+        trykGamleFiltreUdController: _trykGamleFiltreUd,
+        antalFiltreUdController: _antalFiltreUd,
+        trykFoerUdController: _trykFoerUd,
+        trykEfterUdController: _trykEfterUd,
+        hzUdController: _hzUdController,
+        effektUdController: _effektUd,
+        ),
+        const Divider(height: 32),
+        _sektionTitel('LUFTMÆNGDE'),
+        LuftmaengdeVisning(
+        anlaegstype: _valgtAnlaegstype,
+        maaltLuftmaengdeIndController: _luftMaaltIndController,
+        luftmaengdeKVaerdiIndController: _kVaerdiIndController,
+        trykDifferensIndController: _trykDifferensIndController,
+        maksLuftIndController: _maksLuftIndController,
+        maksEffektIndController: _maksEffektIndController,
+        effektMaaltIndController: _effektMaaltIndController,
+        maaltLuftmaengdeUdController: _luftMaaltUdController,
+        luftmaengdeKVaerdiUdController: _kVaerdiUdController,
+        trykDifferensUdController: _trykDifferensUdController,
+        maksLuftUdController: _maksLuftUdController,
+        maksEffektUdController: _maksEffektUdController,
+        effektMaaltUdController: _effektMaaltUdController,
+        visKVaerdiBeregningInd: _visKVaerdiBeregningInd,
+        visEffektBeregningInd: _visEffektBeregningInd,
+        visKVaerdiBeregningUd: _visKVaerdiBeregningUd,
+        visEffektBeregningUd: _visEffektBeregningUd,
+        onSkiftKVaerdiInd: () => setState(() {
+        _visKVaerdiBeregningInd = !_visKVaerdiBeregningInd;
+        if (_visKVaerdiBeregningInd) _visEffektBeregningInd = false;
+        }),
+        onSkiftEffektInd: () => setState(() {
+        _visEffektBeregningInd = !_visEffektBeregningInd;
+        if (_visEffektBeregningInd) _visKVaerdiBeregningInd = false;
+        }),
+        onSkiftKVaerdiUd: () => setState(() {
+        _visKVaerdiBeregningUd = !_visKVaerdiBeregningUd;
+        if (_visKVaerdiBeregningUd) _visEffektBeregningUd = false;
+        }),
+        onSkiftEffektUd: () => setState(() {
+        _visEffektBeregningUd = !_visEffektBeregningUd;
+        if (_visEffektBeregningUd) _visKVaerdiBeregningUd = false;
+        }),
+        ),
+        const Divider(height: 32),
+        _sektionTitel('VARMEGENVINDING'),
+        SwitchListTile(
+        title: Text(
+        _valgtAnlaegstype == 'Ventilationsanlæg'
+        ? 'Kan der regnes på varmegenvinding?'
+            : _valgtAnlaegstype == 'Indblæsningsanlæg'
+        ? 'Er indblæsningsluften opvarmet?'
+            : 'Er udsugningsluften opvarmet?',
+        ),
+        subtitle: const Text('Vælg om beregning skal vises'),
+        value: _visVarmegenvinding,
+        onChanged: (val) => setState(() => _visVarmegenvinding = val),
+        activeColor: _matchingGreen, // Farven HEX #34E0A1
+        inactiveTrackColor: _matchingGreen, // Farven HEX #34E0A1
+        ),
+        if (_visVarmegenvinding)
+        VarmegenvindingSektion(
+        anlaegstype: _valgtAnlaegstype,
+        visVarmegenvinding: _visVarmegenvinding,
+        beregnUdFraIndblaesning: _beregnUdFraIndblaesning,
+        visBeregningsMetode: _valgtAnlaegstype == 'Ventilationsanlæg',
+        onMethodChanged: (val) => setState(() => _beregnUdFraIndblaesning = val),
+        tFriskController: _tFriskController,
+        tIndController: _tIndController,
+        tUdController: _tUdController,
+        tAfkastController: _tAfkastController,
+        hzInd: hzInd,
+        hzUd: hzUd,
+        onVisPopupInd: () {},
+        onVisPopupUd: () {},
+        ),
+        const SizedBox(height: 32),
+        // To knapper: Tilbage og Næste
+        Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+        ElevatedButton(
+        onPressed: () {
+        // Funktion til tilbage navigation
+        Navigator.pop(context);
+        },
+        style: ElevatedButton.styleFrom(
+        backgroundColor: _matchingGreen, // Grøn farve til knapbaggrund
+        ),
+        child: Text(
+        'Tilbage',
+        style: TextStyle(
+        color: _matchingBlue, // Blå farve til teksten
+        ),
+        ),
+        ),
+        const SizedBox(width: 16), // Plads mellem knapperne
+        ElevatedButton(
+        onPressed: _visBilledeBeskrivelsePopup,
+        style: ElevatedButton.styleFrom(
+        backgroundColor: _matchingGreen, // Grøn farve til knapbaggrund
+        ),
+        child: Text(
+        'Næste',
+        style: TextStyle(
+        color: _matchingBlue, // Blå farve til teksten
+        ),
+        ),
+        ),
+        ],
+        ),
+        ],
+        ),
+        ),
+        Container(
+        height: 90,
+        color: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+        Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+        'Måledata',
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        ),
+        Positioned(
+        top: 44,
+        right: 0,
+        child: Container(
+        padding: const EdgeInsets.all(2),
+        decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.all(Radius.circular(6)),
+        ),
+        child: Image.asset(
+        'assets/images/star_logo.png',
+        height: 45,
+        ),
+        ),
+        ),
+        ],
+        ),
+        ),
+        ],
+        ),
+        );
+        }
 
-            const SizedBox(height: 24),
-            if (erVentilationsanlaeg || erIndblaesningsanlaeg) ...[
-              const Text('Ventilatordata – Indblæsning', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              TextField(controller: _trykFoerIndController, decoration: const InputDecoration(labelText: 'Tryk før ventilator (Pa)')),
-              TextField(controller: _trykEfterIndController, decoration: const InputDecoration(labelText: 'Tryk efter ventilator (Pa)')),
-              TextField(controller: _kwIndController, decoration: const InputDecoration(labelText: 'Effekt (kW)')),
-              TextField(controller: _hzIndController, decoration: const InputDecoration(labelText: 'Målt frekvens (Hz)')),
-            ],
-
-            const SizedBox(height: 24),
-            if (erVentilationsanlaeg || erUdsugningsanlaeg) ...[
-              const Text('Ventilatordata – Udsugning', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              TextField(controller: _trykFoerUdController, decoration: const InputDecoration(labelText: 'Tryk før ventilator (Pa)')),
-              TextField(controller: _trykEfterUdController, decoration: const InputDecoration(labelText: 'Tryk efter ventilator (Pa)')),
-              TextField(controller: _kwUdController, decoration: const InputDecoration(labelText: 'Effekt (kW)')),
-              TextField(controller: _hzUdController, decoration: const InputDecoration(labelText: 'Målt frekvens (Hz)')),
-            ],
-
-            const SizedBox(height: 24),
-            const Text('Luftmængde', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            if (erVentilationsanlaeg || erIndblaesningsanlaeg) ...[
-              TextField(controller: _luftmaengdeIndController, decoration: const InputDecoration(labelText: 'Indblæsning (m³/h)')),
-              SwitchListTile(
-                title: const Text('Beregn luftmængde ved 50 Hz (indblæsning)'),
-                value: _visBeregnVed50HzInd,
-                onChanged: (val) => setState(() => _visBeregnVed50HzInd = val),
-              ),
-              if (_visBeregnVed50HzInd) ...[
-                TextField(controller: _hzMaxIndController, decoration: const InputDecoration(labelText: 'Målt luftmængde (m³/h)')),
-                Builder(builder: (context) {
-                  final hz = double.tryParse(_hzIndController.text.replaceAll(',', '.')) ?? 0;
-                  final luft = double.tryParse(_hzMaxIndController.text.replaceAll(',', '.')) ?? 0;
-                  final beregnet = _beregnLuftmaengdeVed50Hz(luft, hz);
-                  return Text('Beregnet luftmængde ved 50 Hz: ${beregnet.toStringAsFixed(0)} m³/h');
-                })
-              ]
-            ],
-            if (erVentilationsanlaeg || erUdsugningsanlaeg) ...[
-              TextField(controller: _luftmaengdeUdController, decoration: const InputDecoration(labelText: 'Udsugning (m³/h)')),
-              SwitchListTile(
-                title: const Text('Beregn luftmængde ved 50 Hz (udsugning)'),
-                value: _visBeregnVed50HzUd,
-                onChanged: (val) => setState(() => _visBeregnVed50HzUd = val),
-              ),
-              if (_visBeregnVed50HzUd) ...[
-                TextField(controller: _hzMaxUdController, decoration: const InputDecoration(labelText: 'Målt luftmængde (m³/h)')),
-                Builder(builder: (context) {
-                  final hz = double.tryParse(_hzUdController.text.replaceAll(',', '.')) ?? 0;
-                  final luft = double.tryParse(_hzMaxUdController.text.replaceAll(',', '.')) ?? 0;
-                  final beregnet = _beregnLuftmaengdeVed50Hz(luft, hz);
-                  return Text('Beregnet luftmængde ved 50 Hz: ${beregnet.toStringAsFixed(0)} m³/h');
-                })
-              ]
-            ],
-
-            const SizedBox(height: 24),
-            const Text('Varmegenvinding', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            SwitchListTile(
-              title: Text(varmegenvindingLabel),
-              value: _visVarmegenvinding,
-              onChanged: (val) => setState(() => _visVarmegenvinding = val),
-            ),
-            if (_visVarmegenvinding && erVentilationsanlaeg) ...[
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(labelText: 'Vælg type varmegenvinding'),
-                value: _valgtType,
-                items: _typer.map((type) => DropdownMenuItem(value: type, child: Text(type))).toList(),
-                onChanged: (val) => setState(() => _valgtType = val!),
-              ),
-              SwitchListTile(
-                title: const Text('Beregn ud fra afkasttemperatur?'),
-                value: _brugAfkast,
-                onChanged: (val) => setState(() => _brugAfkast = val),
-              ),
-              TextField(controller: _tempUdeController, decoration: const InputDecoration(labelText: 'Udetemperatur (°C)')),
-              if (udetempOver10)
-                const Padding(
-                  padding: EdgeInsets.only(top: 8.0),
-                  child: Text(
-                    'OBS: Udetemperaturen er over 10 °C – varmegenvinding kan ikke beregnes.',
-                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              if (!udetempOver10) ...[
-                if (_brugAfkast) ...[
-                  TextField(controller: _tempEfterVarmefladeController, decoration: const InputDecoration(labelText: 'Indblæsningstemperatur efter varmefladen (°C)')),
-                  TextField(controller: _tempUdsugningController, decoration: const InputDecoration(labelText: 'Udsugningstemperatur (°C)')),
-                  TextField(controller: _afkastTempController, decoration: const InputDecoration(labelText: 'Afkasttemperatur (°C)')),
-                ] else ...[
-                  TextField(controller: _tempEfterVarmegenvindingController, decoration: const InputDecoration(labelText: 'Indblæsningstemperatur efter varmegenvinding (°C)')),
-                  TextField(controller: _tempEfterVarmefladeController, decoration: const InputDecoration(labelText: 'Indblæsningstemperatur efter varmefladen (°C)')),
-                  TextField(controller: _tempUdsugningController, decoration: const InputDecoration(labelText: 'Udsugningstemperatur (°C)')),
-                ]
-              ]
-            ],
-            if (_visVarmegenvinding && erIndblaesningsanlaeg)
-              TextField(controller: _tempEfterVarmefladeController, decoration: const InputDecoration(labelText: 'Indblæsningstemperatur efter varmefladen (°C)')),
-            if (_visVarmegenvinding && erUdsugningsanlaeg)
-              TextField(controller: _tempUdsugningController, decoration: const InputDecoration(labelText: 'Udsugningstemperatur (°C)')),
-
-            const SizedBox(height: 32),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Beregning igangsat...')),
-                  );
-                },
-                child: const Text('Beregn'),
-              ),
-            ),
-          ],
+        // Sektionstitel med blå tekst
+        Widget _sektionTitel(String tekst) {
+        return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      color: _matchingGreen, // Grøn farve
+      child: Text(
+        tekst,
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: _matchingBlue, // Inaktiv farve
         ),
       ),
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -5,14 +5,13 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.7.2 <4.0.0"
+  sdk: ^3.7.2
 
 dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  intl: ^0.18.1
-  image_picker: ^1.0.4   # ← tilføjet for at understøtte billedtagning
+  intl: ^0.18.1   # ← denne linje er tilføjet
 
 dev_dependencies:
   flutter_test:
@@ -23,5 +22,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/bravida_logo_rgb_pos.png
-    - assets/images/morville_logo.png
-    - assets/images/star_logo.png
+

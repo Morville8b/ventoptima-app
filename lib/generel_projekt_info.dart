@@ -7,6 +7,7 @@ class GenerelProjektInfo {
   final String teknikerNavn;
   final String telefon;
   final String email;
+  final String afdeling; // Afdeling tilføjet
   final int antalAnlaeg;
   final double elPris;
   final double varmePris;
@@ -22,6 +23,7 @@ class GenerelProjektInfo {
     required this.teknikerNavn,
     required this.telefon,
     required this.email,
+    required this.afdeling, // Afdeling tilføjet som parameter
     required this.antalAnlaeg,
     required this.elPris,
     required this.varmePris,
