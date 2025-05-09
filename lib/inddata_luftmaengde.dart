@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:math';
 
 class LuftmaengdeVisning extends StatelessWidget {
@@ -103,7 +104,6 @@ class LuftmaengdeVisning extends StatelessWidget {
     required VoidCallback onSkiftKVaerdi,
     required VoidCallback onSkiftEffekt,
   }) {
-    // Beregning med K-værdi
     if (visKVaerdiBeregning) {
       final double k = double.tryParse(kVaerdiController.text.replaceAll(',', '.')) ?? 0;
       final double dp = double.tryParse(trykDifferensController.text.replaceAll(',', '.')) ?? 0;
@@ -128,6 +128,10 @@ class LuftmaengdeVisning extends StatelessWidget {
       labelText = 'Målt luftmængde (m³/h)';
     }
 
+    final formatter = <TextInputFormatter>[
+    FilteringTextInputFormatter.allow(RegExp(r'^[-+]?[\d]{0,5}(,\d{0,2})?$')),
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -135,14 +139,13 @@ class LuftmaengdeVisning extends StatelessWidget {
         Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
 
-        // Samlet felt til målt/beregnet luftmængde
         TextField(
           controller: maaltController,
           decoration: InputDecoration(labelText: labelText),
-          keyboardType: TextInputType.number,
+          keyboardType: TextInputType.text,
+          inputFormatters: formatter,
         ),
 
-        // Switch og felter for K-værdi
         SwitchListTile(
           title: const Text('Beregning med K-værdi'),
           value: visKVaerdiBeregning,
@@ -155,16 +158,17 @@ class LuftmaengdeVisning extends StatelessWidget {
           TextField(
             controller: kVaerdiController,
             decoration: const InputDecoration(labelText: 'K-værdi'),
-            keyboardType: TextInputType.number,
+            keyboardType: TextInputType.text,
+            inputFormatters: formatter,
           ),
           TextField(
             controller: trykDifferensController,
             decoration: const InputDecoration(labelText: 'Tryktab over ventilatoren (Pa)'),
-            keyboardType: TextInputType.number,
+            keyboardType: TextInputType.text,
+            inputFormatters: formatter,
           ),
         ],
 
-        // Switch og felter for designdata
         SwitchListTile(
           title: const Text('Beregning ud fra designdata'),
           value: visEffektBeregning,
@@ -177,17 +181,20 @@ class LuftmaengdeVisning extends StatelessWidget {
           TextField(
             controller: maksLuftController,
             decoration: const InputDecoration(labelText: 'Maks. luftmængde (m³/h)'),
-            keyboardType: TextInputType.number,
+            keyboardType: TextInputType.text,
+            inputFormatters: formatter,
           ),
           TextField(
             controller: maksEffektController,
             decoration: const InputDecoration(labelText: 'Maks. effekt (kW)'),
-            keyboardType: TextInputType.number,
+            keyboardType: TextInputType.text,
+            inputFormatters: formatter,
           ),
           TextField(
             controller: effektMaaltController,
             decoration: const InputDecoration(labelText: 'Målt effekt (kW)'),
-            keyboardType: TextInputType.number,
+            keyboardType: TextInputType.text,
+            inputFormatters: formatter,
           ),
         ],
 

@@ -1,10 +1,10 @@
 // Denne fil indeholder struktur og komplet data for Ebmpapst ventilatorer.
 
 class VentilatorData {
-  final int tryk; // fx 50 Pa, 100 Pa, etc.
-  final int luftmaengde; // fx 500, 1000, 1500 m3/h
+  final int tryk;
+  final int luftmaengde;
   final String varenummer;
-  final int effekt; // fx Watt
+  final int effekt; // Watt
 
   VentilatorData({
     required this.tryk,
@@ -13,6 +13,7 @@ class VentilatorData {
     required this.effekt,
   });
 }
+
 
 final List<VentilatorData> EbmpapstVentilatorer = [
 VentilatorData(tryk: 50, luftmaengde: 500, varenummer: '8300100482', effekt: 25),
@@ -1009,3 +1010,77 @@ VentilatorData(tryk: 1500, luftmaengde: 8500, varenummer: '8300100068', effekt: 
 VentilatorData(tryk: 1500, luftmaengde: 9000, varenummer: '8300100068', effekt: 5419),
 VentilatorData(tryk: 1500, luftmaengde: 9500, varenummer: '8300100068', effekt: 5686),
 ];
+
+class EbmpapstResultat {
+  final double tryk;
+  final double luftmaengde;
+  final double effekt;
+  final double aarsforbrugKWh;
+  final double omkostning;
+  final String varenummer;
+  final String kommentar;
+  final double virkningsgrad;
+  final double selvaerdi;
+
+  EbmpapstResultat({
+    required this.tryk,
+    required this.luftmaengde,
+    required this.effekt,
+    required this.aarsforbrugKWh,
+    required this.omkostning,
+    required this.varenummer,
+    required this.kommentar,
+    required this.virkningsgrad,
+    required this.selvaerdi,
+  });
+}
+EbmpapstResultat findNaermesteVentilator(
+    double tryk,
+    double luftmaengde, {
+      double driftstimer = 3000,
+      double elpris = 2.0,
+    }) {
+  final int oprundetTryk = ((tryk / 50).ceil() * 50).toInt();
+  final int oprundetLuft = ((luftmaengde / 500).ceil() * 500).toInt();
+
+  final match = EbmpapstVentilatorer.firstWhere(
+        (v) => v.tryk == oprundetTryk && v.luftmaengde == oprundetLuft,
+    orElse: () => VentilatorData(
+      tryk: oprundetTryk,
+      luftmaengde: oprundetLuft,
+      varenummer: '-',
+      effekt: 0, // ✅ Brug int her
+    ),
+  );
+
+  final double effekt = match.effekt.toDouble();
+  final double luft = match.luftmaengde.toDouble();
+  final double trykVal = match.tryk.toDouble();
+
+  final double aarsforbrugKWh = effekt * driftstimer / 1000;
+  final double omkostning = aarsforbrugKWh * elpris;
+
+  final String kommentar = match.effekt == 0
+      ? 'Kontakt Ebmpapst for beregning – ingen ventilator fundet til dette tryktab og luftmængde.'
+      : '';
+
+  final double virkningsgrad = (effekt > 0 && luft > 0)
+      ? ((luft / 3600) * trykVal) / (effekt) * 100
+      : 0.0;
+
+  final double selvaerdi = (effekt > 0 && luft > 0)
+      ? effekt / (luft / 3600) * 1000
+      : 0.0;
+
+  return EbmpapstResultat(
+    tryk: trykVal,
+    luftmaengde: luft,
+    effekt: effekt,
+    aarsforbrugKWh: aarsforbrugKWh,
+    omkostning: omkostning,
+    varenummer: match.varenummer,
+    kommentar: kommentar,
+    virkningsgrad: virkningsgrad,
+    selvaerdi: selvaerdi,
+  );
+}

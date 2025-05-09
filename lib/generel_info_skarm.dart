@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'generel_projekt_info.dart';
 import 'maaledata_skarm.dart';
 
@@ -18,10 +19,9 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
   final _telefonController = TextEditingController();
   final _emailController = TextEditingController();
   final _antalAnlaegController = TextEditingController();
-  final _elPrisController = TextEditingController(text: '1.2'); // Standardværdi for elpris
-  final _varmePrisController = TextEditingController(text: '0.85'); // Standardværdi for varmepris
+  final _elPrisController = TextEditingController(text: '1,20');
+  final _varmePrisController = TextEditingController(text: '0,85');
 
-  // Driftstimer for hver ugedag
   final Map<String, TextEditingController> _drifttimer = {
     'Mandag': TextEditingController(),
     'Tirsdag': TextEditingController(),
@@ -36,26 +36,16 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
   final List<String> _driftperioder = ['Døgn', 'Dagtimer', 'Nattetimer'];
   String _valgtDriftperiode = 'Dagtimer';
 
-  // Afdelinger til dropdown-menu
   final List<String> _afdelinger = [
-    'Aalborg',
-    'Randers',
-    'Aarhus',
-    'Horsens',
-    'Kolding',
-    'Esbjerg',
-    'Odense',
-    'Brøndby',
+    'Aalborg', 'Randers', 'Aarhus', 'Horsens', 'Kolding', 'Esbjerg', 'Odense', 'Brøndby',
   ];
-  String? _valgtAfdeling; // Holder styr på valgt afdeling
+  String? _valgtAfdeling;
 
-  // Farverne der matcher logoet
-  final Color _matchingGreen = Color(0xFF34E0A1); // Farven HEX #34E0A1
-  final Color _matchingBlue = Color(0xFF006390); // Farven HEX #006390
+  final Color _matchingGreen = Color(0xFF34E0A1);
+  final Color _matchingBlue = Color(0xFF006390);
 
   @override
   void dispose() {
-    // Ryd op i controllerne, når skærmen lukkes
     _kundeNavnController.dispose();
     _adresseController.dispose();
     _postnrByController.dispose();
@@ -73,15 +63,13 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
     super.dispose();
   }
 
-  // Gå videre til næste skærm og send projektinfo
   void _gaVidere() {
     final driftTimerPrUge = _drifttimer.values
         .map((c) => double.tryParse(c.text.replaceAll(',', '.')) ?? 0)
         .toList();
 
-    // Hent elprisen og varmeprisen, og brug standardværdierne, hvis ikke de er indtastet
-    final elPris = double.tryParse(_elPrisController.text.replaceAll(',', '.')) ?? 1.2; // Standard 1.2 kr/kWh
-    final varmePris = double.tryParse(_varmePrisController.text.replaceAll(',', '.')) ?? 0.85; // Standard 0.85 kr/kWh
+    final elPris = double.tryParse(_elPrisController.text.replaceAll(',', '.')) ?? 1.20;
+    final varmePris = double.tryParse(_varmePrisController.text.replaceAll(',', '.')) ?? 0.85;
 
     final projektInfo = GenerelProjektInfo(
       kundeNavn: _kundeNavnController.text,
@@ -91,7 +79,7 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
       teknikerNavn: _teknikerNavnController.text,
       telefon: _telefonController.text,
       email: _emailController.text,
-      afdeling: _valgtAfdeling ?? '', // Sørg for at afdeling bliver sendt
+      afdeling: _valgtAfdeling ?? '',
       antalAnlaeg: int.tryParse(_antalAnlaegController.text) ?? 1,
       elPris: elPris,
       varmePris: varmePris,
@@ -100,7 +88,6 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
       driftperiode: _valgtDriftperiode,
     );
 
-    // Navigere til MaaledataSkarm med projektinfo
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -111,19 +98,22 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
 
   @override
   Widget build(BuildContext context) {
+    final decimalInputFormatter = [
+      FilteringTextInputFormatter.allow(RegExp(r'[0-9,\-+]')),
+    ];
+    final intInputFormatter = [
+      FilteringTextInputFormatter.digitsOnly,
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Generel Projektinformation'),
-        backgroundColor: Colors.white,  // Ændrer baggrundsfarven til hvid
-        elevation: 0,  // Fjerner skyggen under AppBar
+        backgroundColor: Colors.white,
+        elevation: 0,
         actions: [
-          // Logo i øverste højre hjørne
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Image.asset(
-              'assets/images/star_logo.png', // Skift til dit logo billede
-              height: 45,
-            ),
+            child: Image.asset('assets/images/star_logo.png', height: 45),
           ),
         ],
       ),
@@ -132,7 +122,6 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Sektion: Kundens oplysninger
             _sektionTitel('Kundens oplysninger'),
             TextField(controller: _kundeNavnController, decoration: const InputDecoration(labelText: 'Kundens navn')),
             TextField(controller: _adresseController, decoration: const InputDecoration(labelText: 'Adresse')),
@@ -140,69 +129,65 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
             TextField(controller: _attController, decoration: const InputDecoration(labelText: 'Att.')),
 
             const SizedBox(height: 24),
-            // Sektion: Rapporten er udført af
             _sektionTitel('Rapporten er udført af'),
             TextField(controller: _teknikerNavnController, decoration: const InputDecoration(labelText: 'Teknikers navn')),
             TextField(controller: _telefonController, decoration: const InputDecoration(labelText: 'Telefonnr.')),
             TextField(controller: _emailController, decoration: const InputDecoration(labelText: 'E-mail')),
 
-            // Tilføjet Dropdown for afdeling
             const SizedBox(height: 24),
             _sektionTitel('Afdeling'),
             DropdownButtonFormField<String>(
               value: _valgtAfdeling,
               decoration: const InputDecoration(labelText: 'Vælg afdeling'),
               items: _afdelinger.map((afdeling) {
-                return DropdownMenuItem(
-                  value: afdeling,
-                  child: Text(afdeling),
-                );
+                return DropdownMenuItem(value: afdeling, child: Text(afdeling));
               }).toList(),
               onChanged: (val) => setState(() => _valgtAfdeling = val),
             ),
 
             const SizedBox(height: 24),
-            // Sektion: Antal anlæg i alt
             _sektionTitel('Antal anlæg i alt'),
             TextField(
               controller: _antalAnlaegController,
               decoration: const InputDecoration(labelText: 'Antal anlæg'),
               keyboardType: TextInputType.number,
+              inputFormatters: intInputFormatter,
             ),
 
             const SizedBox(height: 24),
-            // Sektion: Energipriser
             _sektionTitel('Energipriser'),
             TextField(
               controller: _elPrisController,
               decoration: const InputDecoration(labelText: 'El-pris (kr./kWh)'),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
+              inputFormatters: decimalInputFormatter,
             ),
             TextField(
               controller: _varmePrisController,
               decoration: const InputDecoration(labelText: 'Varmepris (kr./kWh)'),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
+              inputFormatters: decimalInputFormatter,
             ),
 
             const SizedBox(height: 24),
-            // Sektion: Drifttimer
             _sektionTitel('Drifttimer'),
             ..._drifttimer.entries.map((entry) {
               return TextField(
                 controller: entry.value,
                 decoration: InputDecoration(labelText: '${entry.key}'),
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.text,
+                inputFormatters: decimalInputFormatter,
               );
             }),
 
             TextField(
               controller: _ugerPerAarController,
               decoration: const InputDecoration(labelText: 'Antal uger pr. år'),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
+              inputFormatters: decimalInputFormatter,
             ),
 
             const SizedBox(height: 24),
-            // Sektion: Tidsrum for drift
             _sektionTitel('Tidsrum for drift'),
             DropdownButtonFormField<String>(
               value: _valgtDriftperiode,
@@ -215,12 +200,11 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
             ),
 
             const SizedBox(height: 32),
-            // Knappen 'Næste' med farver
             Center(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _matchingGreen, // Grøn farve til knapbaggrund
-                  foregroundColor: _matchingBlue, // Blå farve til tekst
+                  backgroundColor: _matchingGreen,
+                  foregroundColor: _matchingBlue,
                 ),
                 onPressed: _gaVidere,
                 child: const Text('Næste'),
@@ -232,18 +216,17 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
     );
   }
 
-  // Sektionstitel med farver
   Widget _sektionTitel(String tekst) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      color: _matchingGreen, // Grøn farve
+      color: _matchingGreen,
       child: Text(
         tekst,
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
-          color: _matchingBlue, // Blå farve
+          color: _matchingBlue,
         ),
       ),
     );
