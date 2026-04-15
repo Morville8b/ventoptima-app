@@ -1,17 +1,17 @@
-// Fil: inndata_varmegenvindning.dart
-
 import 'package:flutter/material.dart';
 
+// ——— Beregninger ———
 double beregnVirkningsgradFraIndblaesning(double tind, double tfrisk, double tud) {
-  if ((tud - tfrisk) == 0) return 0;
+  if ((tud - tfrisk) == 0) return 0; // hvorfor: undgå division med 0
   return ((tind - tfrisk) / (tud - tfrisk)) * 100;
 }
 
 double beregnVirkningsgradFraAfkast(double tafkast, double tfrisk, double tud) {
-  if ((tud - tfrisk) == 0) return 0;
+  if ((tud - tfrisk) == 0) return 0; // hvorfor: undgå division med 0
   return ((tud - tafkast) / (tud - tfrisk)) * 100;
 }
 
+// ——— Popup ———
 Future<void> visMaxBelastningPopup({
   required BuildContext context,
   required String titel,
@@ -19,29 +19,34 @@ Future<void> visMaxBelastningPopup({
   required TextEditingController trykFoerController,
   required TextEditingController trykEfterController,
 }) async {
-  return showDialog(
+  // hvorfor: brug await så returtype matcher Future<void>
+  await showDialog<void>(
     context: context,
     builder: (_) => AlertDialog(
       title: Text(titel),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: luftController,
-            decoration: const InputDecoration(labelText: 'Luftmængde ved maks belastning (m³/h)'),
-            keyboardType: TextInputType.number,
-          ),
-          TextField(
-            controller: trykFoerController,
-            decoration: const InputDecoration(labelText: 'Tryk før ventilator (Pa)'),
-            keyboardType: TextInputType.number,
-          ),
-          TextField(
-            controller: trykEfterController,
-            decoration: const InputDecoration(labelText: 'Tryk efter ventilator (Pa)'),
-            keyboardType: TextInputType.number,
-          ),
-        ],
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: luftController,
+              decoration: const InputDecoration(labelText: 'Luftmængde ved maks belastning (m³/h)'),
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.next,
+            ),
+            TextField(
+              controller: trykFoerController,
+              decoration: const InputDecoration(labelText: 'Tryk før ventilator (Pa)'),
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.next,
+            ),
+            TextField(
+              controller: trykEfterController,
+              decoration: const InputDecoration(labelText: 'Tryk efter ventilator (Pa)'),
+              keyboardType: TextInputType.text,
+            ),
+          ],
+        ),
       ),
       actions: [
         TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annullér')),
@@ -51,6 +56,7 @@ Future<void> visMaxBelastningPopup({
   );
 }
 
+// ——— Widget ———
 typedef OnMethodChanged = void Function(bool udFraIndblaesning);
 
 class VarmegenvindingSektion extends StatelessWidget {
@@ -61,7 +67,8 @@ class VarmegenvindingSektion extends StatelessWidget {
   final OnMethodChanged onMethodChanged;
 
   final TextEditingController tFriskController;
-  final TextEditingController tIndController;
+  final TextEditingController tIndEfterGenvindingController;
+  final TextEditingController tIndEfterVarmefladeController;
   final TextEditingController tUdController;
   final TextEditingController tAfkastController;
   final double hzInd;
@@ -77,7 +84,8 @@ class VarmegenvindingSektion extends StatelessWidget {
     required this.beregnUdFraIndblaesning,
     required this.onMethodChanged,
     required this.tFriskController,
-    required this.tIndController,
+    required this.tIndEfterGenvindingController,
+    required this.tIndEfterVarmefladeController,
     required this.tUdController,
     required this.tAfkastController,
     required this.hzInd,
@@ -86,21 +94,19 @@ class VarmegenvindingSektion extends StatelessWidget {
     required this.onVisPopupUd,
   });
 
+  double _parse(TextEditingController c) => double.tryParse(c.text.replaceAll(',', '.')) ?? 0;
+
   @override
   Widget build(BuildContext context) {
     if (!visVarmegenvinding) return const SizedBox.shrink();
 
-    final double tFrisk = double.tryParse(tFriskController.text.replaceAll(',', '.')) ?? 0;
-    final double tInd = double.tryParse(tIndController.text.replaceAll(',', '.')) ?? 0;
-    final double tUd = double.tryParse(tUdController.text.replaceAll(',', '.')) ?? 0;
-    final double tAfkast = double.tryParse(tAfkastController.text.replaceAll(',', '.')) ?? 0;
+    final double tFrisk = _parse(tFriskController);
+    final double tInd = _parse(beregnUdFraIndblaesning ? tIndEfterGenvindingController : tIndEfterVarmefladeController);
+    final double tUd = _parse(tUdController);
+    final double tAfkast = _parse(tAfkastController);
 
     final bool visAdvarsel = tFrisk > 10;
-    final double virkningsgrad = visAdvarsel
-        ? 0
-        : beregnUdFraIndblaesning
-        ? beregnVirkningsgradFraIndblaesning(tInd, tFrisk, tUd)
-        : beregnVirkningsgradFraAfkast(tAfkast, tFrisk, tUd);
+
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,34 +114,28 @@ class VarmegenvindingSektion extends StatelessWidget {
         const SizedBox(height: 16),
 
         if (anlaegstype == 'Ventilationsanlæg') ...[
-          Text('Beregningsmetode', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text('Beregningsmetode', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           SwitchListTile(
-            title: const Text('Beregningsmetode'),
-            subtitle: Text(
-              'Aktuelt: ' + (beregnUdFraIndblaesning ? 'Indblæsningstemperatur' : 'Afkasttemperatur'),
-            ),
+            subtitle: Text('Beregn ud fra: ${beregnUdFraIndblaesning ? 'Indblæsningstemperatur' : 'Afkasttemperatur'}'),
             value: beregnUdFraIndblaesning,
             onChanged: visBeregningsMetode ? onMethodChanged : null,
-            activeColor: Color(0xFF34E0A1), // Grøn farve til aktiv switch
-            inactiveTrackColor: Color(0xFF34E0A1), // Grøn farve til inaktiv switch
+            activeColor: const Color(0xFF34E0A1),
+            inactiveTrackColor: const Color(0xFF34E0A1),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
               beregnUdFraIndblaesning
-                  ? 'η = (Tᵢₙd - T𝒇𝒓𝒊𝒔𝒌) ÷ (Tᵤ𝒅 - T𝒇𝒓𝒊𝒔𝒌) × 100'
-                  : 'η = (Tᵤ𝒅 - Tₐ𝒇𝒌ₐₛₜ) ÷ (Tᵤ𝒅 - T𝒇𝒓𝒊𝒔𝒌) × 100',
-              style: const TextStyle(
-                fontStyle: FontStyle.italic,
-                fontSize: 14,
-                color: Colors.grey,
-              ),
+                  ? 'η = (T_ind − T_frisk) ÷ (T_ud − T_frisk) × 100'
+                  : 'η = (T_ud − T_afkast) ÷ (T_ud − T_frisk) × 100',
+              style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 14, color: Colors.grey),
             ),
           ),
           TextField(
             controller: tFriskController,
             decoration: const InputDecoration(labelText: 'Frisklufttemperatur (°C)'),
-            keyboardType: TextInputType.number,
+            keyboardType: TextInputType.text,
+            textInputAction: TextInputAction.next,
           ),
           if (visAdvarsel)
             const Padding(
@@ -147,80 +147,63 @@ class VarmegenvindingSektion extends StatelessWidget {
             ),
           if (beregnUdFraIndblaesning) ...[
             TextField(
-              controller: tIndController,
+              controller: tIndEfterGenvindingController,
               decoration: const InputDecoration(labelText: 'Indblæsningstemperatur efter varmegenvinding (°C)'),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.next,
             ),
             TextField(
-              controller: tIndController,
+              controller: tIndEfterVarmefladeController,
               decoration: const InputDecoration(labelText: 'Indblæsningstemperatur efter varmeflade (°C)'),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.next,
             ),
             TextField(
               controller: tUdController,
               decoration: const InputDecoration(labelText: 'Udsugningstemperatur (°C)'),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
             ),
           ] else ...[
             TextField(
-              controller: tIndController,
+              controller: tIndEfterVarmefladeController,
               decoration: const InputDecoration(labelText: 'Indblæsningstemperatur efter varmeflade (°C)'),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.next,
             ),
             TextField(
               controller: tUdController,
               decoration: const InputDecoration(labelText: 'Udsugningstemperatur (°C)'),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.next,
             ),
             TextField(
               controller: tAfkastController,
               decoration: const InputDecoration(labelText: 'Afkasttemperatur (°C)'),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
             ),
           ],
         ] else if (anlaegstype == 'Indblæsningsanlæg') ...[
-          Text(
-            'Er indblæsningsluften opvarmet?',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+          const Text('Er indblæsningsluften opvarmet?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           TextField(
-            controller: tIndController,
+            controller: tIndEfterVarmefladeController,
             decoration: const InputDecoration(labelText: 'Indblæsningstemperatur efter varmeflade (°C)'),
-            keyboardType: TextInputType.number,
+            keyboardType: TextInputType.text,
           ),
         ] else if (anlaegstype == 'Udsugningsanlæg') ...[
-          Text(
-            'Er udsugningsluften opvarmet?',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+          const Text('Er udsugningsluften opvarmet?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           TextField(
             controller: tUdController,
             decoration: const InputDecoration(labelText: 'Udsugningstemperatur (°C)'),
-            keyboardType: TextInputType.number,
+            keyboardType: TextInputType.text,
           ),
         ],
 
         const SizedBox(height: 16),
-        if (anlaegstype == 'Ventilationsanlæg')
-          TextField(
-            readOnly: true,
-            controller: TextEditingController(text: virkningsgrad.toStringAsFixed(1)),
-            decoration: const InputDecoration(
-              labelText: 'Virkningsgrad (%)',
-              labelStyle: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
 
-        if (hzInd > 0 && hzInd < 50)
-          ElevatedButton(
-            onPressed: onVisPopupInd,
-            child: const Text('Indtast data for indblæsning (Hz < 50)'),
-          ),
-        if (hzUd > 0 && hzUd < 50)
-          ElevatedButton(
-            onPressed: onVisPopupUd,
-            child: const Text('Indtast data for udsugning (Hz < 50)'),
-          ),
+
+
+        // valgfrit: vis beregnet virkningsgrad
+
       ],
     );
   }

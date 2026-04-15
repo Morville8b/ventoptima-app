@@ -1,24 +1,41 @@
 name: ventoptima
 description: "App til energioptimering af ventilationsanlæg"
 publish_to: 'none'
-
-version: 1.0.0+1
-
+version: 1.0.20+31
 environment:
   sdk: ">=3.7.2 <4.0.0"
-
 dependencies:
   flutter:
     sdk: flutter
+  # 🌍 UI & generelle pakker
   cupertino_icons: ^1.0.8
-  intl: ^0.18.1
-  image_picker: ^1.0.4   # ← tilføjet for at understøtte billedtagning
-
+  intl: ^0.20.2
+  # 📸 Billeder & filer
+  image_picker: ^1.0.4
+  path_provider: ^2.1.2
+  file_picker: ^8.1.7
+  # 📄 PDF og print
+  pdf: ^3.11.1
+  printing: ^5.12.0
+  syncfusion_flutter_pdf: ^31.1.23
+  # ☁️ Supabase (database og login)
+  supabase_flutter: ^2.10.2
+  # 📧 Mailafsendelse (SMTP på Android, Outlook på Windows)
+  mailer: ^6.5.0
+  url_launcher: ^6.3.1
+  dio: ^5.4.0
+  # 📄 Sideindikator til rapportvisning (WormEffect m.m.)
+  smooth_page_indicator: ^1.2.0
+  # 🔒 Sikkerhed og enhedsdata
+  flutter_secure_storage: ^9.2.4
+  device_info_plus: ^10.0.0
+  connectivity_plus: ^7.0.0
+  package_info_plus: ^8.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
-
+  flutter_lints: ^6.0.0
+  msix: ^3.16.7
 flutter:
   uses-material-design: true
   assets:
@@ -28,3 +45,19 @@ flutter:
     - assets/images/ebmpapst.png
     - assets/images/novenco.png
     - assets/images/ziehlabegg.png
+    - assets/images/ebmpapst_trans_2.png
+    - assets/images/camfil_logo.png
+    - assets/images/opmaaling_af_ventilatorkammer.png
+    - assets/images/filter.png
+    - assets/images/filterkammer.png
+    - assets/images/camfill.png
+    - assets/images/lunger.png
+msix_config:
+  display_name: VentOptima
+  publisher_display_name: VentOptima ApS
+  identity_name: VentOptimaApS.VentOptima
+  publisher: CN=716FD48F-966B-4E48-A717-A279EC7EB992
+  msix_version: 1.0.21.0
+  logo_path: assets/images/morville_logo.png
+  capabilities: internetClient
+  store: true

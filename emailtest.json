@@ -1,0 +1,5 @@
+{
+  "to": "ventoptima.app@outlook.com",
+  "subject": "Test fra Supabase",
+  "html": "<h1>Det virker!</h1><p>VentOptima email test.</p>"
+}

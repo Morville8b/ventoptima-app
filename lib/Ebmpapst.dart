@@ -1,4 +1,6 @@
 // Denne fil indeholder struktur og komplet data for Ebmpapst ventilatorer.
+import 'ventilator_samlet_beregning.dart';
+import 'ebmpapst_priser.dart';
 
 class VentilatorData {
   final int tryk;
@@ -14,6 +16,40 @@ class VentilatorData {
   });
 }
 
+class EbmpapstResultat implements BaseOekonomiResultat {
+  @override final double tryk;
+  @override final double luftmaengde;
+  @override final double effekt;
+  @override final double aarsforbrugKWh;
+  @override final double omkostning;
+  @override final double virkningsgrad;
+  @override final double selvaerdi;
+  @override final double tilbagebetalingstid;
+
+  final double samletOmkostning;  // Ikke @override
+  final double aarsbesparelse;    // Ikke @override
+
+  @override final String varenummer;
+  final String kommentar;
+
+  @override
+  double get pris => samletOmkostning;
+
+  EbmpapstResultat({
+    required this.tryk,
+    required this.luftmaengde,
+    required this.effekt,
+    required this.aarsforbrugKWh,
+    required this.omkostning,
+    required this.virkningsgrad,
+    required this.selvaerdi,
+    required this.tilbagebetalingstid,
+    required this.varenummer,
+    required this.kommentar,
+    required this.samletOmkostning,
+    required this.aarsbesparelse,
+  });
+}
 
 final List<VentilatorData> EbmpapstVentilatorer = [
 VentilatorData(tryk: 50, luftmaengde: 500, varenummer: '8300100482', effekt: 25),
@@ -1011,76 +1047,64 @@ VentilatorData(tryk: 1500, luftmaengde: 9000, varenummer: '8300100068', effekt: 
 VentilatorData(tryk: 1500, luftmaengde: 9500, varenummer: '8300100068', effekt: 5686),
 ];
 
-class EbmpapstResultat {
-  final double tryk;
-  final double luftmaengde;
-  final double effekt;
-  final double aarsforbrugKWh;
-  final double omkostning;
-  final String varenummer;
-  final String kommentar;
-  final double virkningsgrad;
-  final double selvaerdi;
-
-  EbmpapstResultat({
-    required this.tryk,
-    required this.luftmaengde,
-    required this.effekt,
-    required this.aarsforbrugKWh,
-    required this.omkostning,
-    required this.varenummer,
-    required this.kommentar,
-    required this.virkningsgrad,
-    required this.selvaerdi,
-  });
-}
-EbmpapstResultat findNaermesteVentilator(
+EbmpapstResultat findNaermesteEbmpapstVentilator(
     double tryk,
     double luftmaengde, {
-      double driftstimer = 3000,
-      double elpris = 2.0,
+      required double driftstimer,
+      required double elpris,
+      required double samletOmkostning,
+      required double aarsbesparelse,
     }) {
-  final int oprundetTryk = ((tryk / 50).ceil() * 50).toInt();
-  final int oprundetLuft = ((luftmaengde / 500).ceil() * 500).toInt();
+  final int oprundetTryk = (tryk / 50).ceil() * 50;
+  final int oprundetLuft = (luftmaengde / 500).ceil() * 500;
 
   final match = EbmpapstVentilatorer.firstWhere(
         (v) => v.tryk == oprundetTryk && v.luftmaengde == oprundetLuft,
     orElse: () => VentilatorData(
       tryk: oprundetTryk,
       luftmaengde: oprundetLuft,
-      varenummer: '-',
-      effekt: 0, // ✅ Brug int her
+      varenummer: 'Kontakt Ebmpapst – ingen ventilator fundet til dette tryktab og luftmængde.',
+      effekt: 0,
     ),
   );
 
   final double effekt = match.effekt.toDouble();
-  final double luft = match.luftmaengde.toDouble();
-  final double trykVal = match.tryk.toDouble();
+  final double luftmaengdeMatch = match.luftmaengde.toDouble();
+  final double trykMatch = match.tryk.toDouble();
 
-  final double aarsforbrugKWh = effekt * driftstimer / 1000;
+  final double aarsforbrugKWh = (effekt * driftstimer) / 1000;
   final double omkostning = aarsforbrugKWh * elpris;
 
-  final String kommentar = match.effekt == 0
-      ? 'Kontakt Ebmpapst for beregning – ingen ventilator fundet til dette tryktab og luftmængde.'
+  final bool ingenVentilator = (effekt == 0);
+
+  final String kommentar = ingenVentilator
+      ? 'Kontakt Ebmpapst – ingen ventilator fundet til dette tryktab og luftmængde.'
       : '';
 
-  final double virkningsgrad = (effekt > 0 && luft > 0)
-      ? ((luft / 3600) * trykVal) / (effekt) * 100
+  final double virkningsgrad = (!ingenVentilator && luftmaengdeMatch > 0)
+      ? ((luftmaengdeMatch / 3600.0) * trykMatch) / effekt * 100
       : 0.0;
 
-  final double selvaerdi = (effekt > 0 && luft > 0)
-      ? effekt / (luft / 3600) * 1000
+  final double selvaerdi = (!ingenVentilator && luftmaengdeMatch > 0)
+      ? effekt / (luftmaengdeMatch / 3600.0)
       : 0.0;
+
+  final double tilbagebetalingstid = (!ingenVentilator && samletOmkostning > 0 && aarsbesparelse > 0)
+      ? samletOmkostning / aarsbesparelse
+      : double.infinity;
 
   return EbmpapstResultat(
-    tryk: trykVal,
-    luftmaengde: luft,
+    tryk: trykMatch,
+    luftmaengde: luftmaengdeMatch,
     effekt: effekt,
-    aarsforbrugKWh: aarsforbrugKWh,
-    omkostning: omkostning,
+    aarsforbrugKWh: ingenVentilator ? 0 : aarsforbrugKWh,
+    omkostning: ingenVentilator ? 0 : omkostning,
     varenummer: match.varenummer,
     kommentar: kommentar,
     virkningsgrad: virkningsgrad,
     selvaerdi: selvaerdi,
+    tilbagebetalingstid: tilbagebetalingstid,
+    samletOmkostning: ingenVentilator ? 0 : samletOmkostning,
+    aarsbesparelse: ingenVentilator ? 0 : aarsbesparelse,
   );
 }

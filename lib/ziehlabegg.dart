@@ -1,10 +1,11 @@
-// Denne fil indeholder struktur og komplet data for ZiehlAbegg ventilatorer.
+import 'ventilator_samlet_beregning.dart';
+import 'ziehlabegg_priser.dart';
 
 class VentilatorData {
-  final int tryk; // fx 50 Pa, 100 Pa, etc.
-  final int luftmaengde; // fx 500, 1000, 1500 m3/h
+  final int tryk;
+  final int luftmaengde;
   final String varenummer;
-  final int effekt; // fx Watt
+  final double effekt;
 
   VentilatorData({
     required this.tryk,
@@ -14,7 +15,44 @@ class VentilatorData {
   });
 }
 
-final List<VentilatorData> ziehlabeggVentilatorer = [
+class ZiehlAbeggResultat implements BaseOekonomiResultat {
+  @override final double tryk;
+  @override final double luftmaengde;
+  @override final double effekt;
+  @override final double aarsforbrugKWh;
+  @override final double omkostning;
+  @override final double virkningsgrad;
+  @override final double selvaerdi;
+  @override final double tilbagebetalingstid;
+
+  final double samletOmkostning;
+  final double aarsbesparelse;
+
+  final String varenummer;
+  final String kommentar;
+
+
+  @override
+  double get pris => (ziehlAbeggPriser[varenummer] ?? 0).toDouble();
+
+  ZiehlAbeggResultat({
+    required this.tryk,
+    required this.luftmaengde,
+    required this.effekt,
+    required this.aarsforbrugKWh,
+    required this.omkostning,
+    required this.virkningsgrad,
+    required this.selvaerdi,
+    required this.tilbagebetalingstid,
+    required this.varenummer,
+    required this.kommentar,
+    required this.samletOmkostning,
+    required this.aarsbesparelse,
+  });
+}
+
+
+final List<VentilatorData> ziehlAbeggVentilatorListe = [
 VentilatorData(tryk: 50, luftmaengde: 500, varenummer: '116883/a01', effekt: 23),
 VentilatorData(tryk: 50, luftmaengde: 1000, varenummer: '116883/a01', effekt: 45),
 VentilatorData(tryk: 50, luftmaengde: 1500, varenummer: '116883/a01', effekt: 85),
@@ -966,3 +1004,65 @@ VentilatorData(tryk: 1250, luftmaengde: 17500, varenummer: '2x118582/a01', effek
 VentilatorData(tryk: 1250, luftmaengde: 10000, varenummer: '2x116897/a01', effekt: 5394),
 VentilatorData(tryk: 1250, luftmaengde: 19000, varenummer: '2x118582/a01', effekt: 10788),
 ];
+ZiehlAbeggResultat findNaermesteZiehlAbeggVentilator(
+    double tryk,
+    double luftmaengde, {
+      required double driftstimer,
+      required double elpris,
+      required double samletOmkostning,
+      required double aarsbesparelse,
+    }) {
+  final int oprundetTryk = ((tryk / 50).ceil() * 50).toInt();
+  final int oprundetLuft = ((luftmaengde / 500).ceil() * 500).toInt();
+
+  final match = ziehlAbeggVentilatorListe.firstWhere(
+        (v) => v.tryk == oprundetTryk && v.luftmaengde == oprundetLuft,
+    orElse: () => VentilatorData(
+      tryk: oprundetTryk,
+      luftmaengde: oprundetLuft,
+      effekt: 0,
+      varenummer: 'Kontakt Ziehl-Abegg – ingen ventilator fundet til dette tryktab og luftmængde.',
+    ),
+  );
+
+  final double effekt = match.effekt.toDouble();
+  final double luft = match.luftmaengde.toDouble();
+  final double trykVal = match.tryk.toDouble();
+
+  final bool ingenVentilator = (effekt == 0);
+
+  final double aarsforbrugKWh = (effekt * driftstimer) / 1000;
+  final double omkostning = aarsforbrugKWh * elpris;
+
+  final String kommentar = ingenVentilator
+      ? 'Kontakt Ziehl-Abegg – ingen ventilator fundet til dette tryktab og luftmængde.'
+      : '';
+
+  final double virkningsgrad = (!ingenVentilator && luft > 0)
+      ? ((luft / 3600.0) * trykVal) / effekt * 100
+      : 0.0;
+
+  final double selvaerdi = (!ingenVentilator && luft > 0)
+      ? effekt / (luft / 3600.0)
+      : 0.0;
+
+  final double tilbagebetalingstid =
+  (!ingenVentilator && samletOmkostning > 0 && aarsbesparelse > 0)
+      ? samletOmkostning / aarsbesparelse
+      : double.infinity;
+
+  return ZiehlAbeggResultat(
+    tryk: trykVal,
+    luftmaengde: luft,
+    effekt: effekt,
+    aarsforbrugKWh: ingenVentilator ? 0 : aarsforbrugKWh,
+    omkostning: ingenVentilator ? 0 : omkostning,
+    varenummer: match.varenummer,
+    kommentar: kommentar,
+    virkningsgrad: virkningsgrad,
+    selvaerdi: selvaerdi,
+    tilbagebetalingstid: tilbagebetalingstid,
+    samletOmkostning: ingenVentilator ? 0 : samletOmkostning,
+    aarsbesparelse: ingenVentilator ? 0 : aarsbesparelse,
+  );
+}

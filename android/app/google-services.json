@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "833886489963",
+    "project_id": "ventoptima-6d9fc",
+    "storage_bucket": "ventoptima-6d9fc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:833886489963:android:ce0cde9cfbe975dc0f902e",
+        "android_client_info": {
+          "package_name": "dk.ventoptima.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAl2HHduH7DtqOz_jTw9o2nJcu1_59BiTw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

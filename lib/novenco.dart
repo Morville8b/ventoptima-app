@@ -1,10 +1,11 @@
-// Denne fil indeholder struktur og komplet data for Novenco ventilatorer.
-
+import 'ventilator_samlet_beregning.dart';
+import 'novenco_priser.dart';
 class VentilatorData {
-  final int tryk; // fx 50 Pa, 100 Pa, etc.
-  final int luftmaengde; // fx 500, 1000, 1500 m3/h
+  final int tryk;
+  final int luftmaengde;
   final String varenummer;
-  final int effekt; // fx Watt
+  final double effekt;
+
 
   VentilatorData({
     required this.tryk,
@@ -13,8 +14,44 @@ class VentilatorData {
     required this.effekt,
   });
 }
+class NovencoResultat implements BaseOekonomiResultat {
+  @override final double tryk;
+  @override final double luftmaengde;
+  @override final double effekt;
+  @override final double aarsforbrugKWh;
+  @override final double omkostning;
+  @override final double virkningsgrad;
+  @override final double selvaerdi;
+  @override final double tilbagebetalingstid;
 
-final List<VentilatorData> novencoVentilatorer = [
+
+  final double samletOmkostning;
+  final double aarsbesparelse;
+
+  @override
+  double get pris => (novencoPriser[varenummer] ?? 0).toDouble();
+
+  @override final String varenummer;
+  final String kommentar;
+
+  NovencoResultat({
+    required this.tryk,
+    required this.luftmaengde,
+    required this.effekt,
+    required this.aarsforbrugKWh,
+    required this.omkostning,
+    required this.virkningsgrad,
+    required this.selvaerdi,
+    required this.tilbagebetalingstid,
+    required this.varenummer,
+    required this.kommentar,
+    required this.samletOmkostning,
+    required this.aarsbesparelse,
+
+  });
+}
+
+final List<VentilatorData> novencoVentilatorListe = [
 VentilatorData(tryk: 50, luftmaengde: 2000, varenummer: '30056964', effekt: 20),
 VentilatorData(tryk: 50, luftmaengde: 3000, varenummer: '30047875', effekt: 28),
 VentilatorData(tryk: 50, luftmaengde: 3500, varenummer: '30047879', effekt: 33),
@@ -1341,3 +1378,67 @@ VentilatorData(tryk: 1500, luftmaengde: 25500, varenummer: '30047881', effekt: 1
 VentilatorData(tryk: 1500, luftmaengde: 26000, varenummer: '30047881', effekt: 12647),
 VentilatorData(tryk: 1500, luftmaengde: 26500, varenummer: '30047881', effekt: 12906),
 ];
+
+NovencoResultat findNaermesteNovencoVentilator(
+    double tryk,
+    double luftmaengde, {
+      required double driftstimer,
+      required double elpris,
+      required double samletOmkostning,
+      required double aarsbesparelse,
+    }) {
+  final int oprundetTryk = ((tryk / 50).ceil() * 50).toInt();
+  final int oprundetLuft = ((luftmaengde / 500).ceil() * 500).toInt();
+
+  final match = novencoVentilatorListe.firstWhere(
+        (v) => v.tryk == oprundetTryk && v.luftmaengde == oprundetLuft,
+    orElse: () => VentilatorData(
+      tryk: oprundetTryk,
+      luftmaengde: oprundetLuft,
+      effekt: 0,
+      varenummer: 'Kontakt Novenco – ingen ventilator fundet til dette tryktab og luftmængde.',
+    ),
+  );
+
+  final double effekt = match.effekt.toDouble();
+  final double luft = match.luftmaengde.toDouble();
+  final double trykVal = match.tryk.toDouble();
+
+  final bool ingenVentilator = (effekt == 0);
+
+  final double aarsforbrugKWh = (effekt * driftstimer) / 1000;
+  final double omkostning = aarsforbrugKWh * elpris;
+
+  final String kommentar = ingenVentilator
+      ? 'Kontakt Novenco – ingen ventilator fundet til dette tryktab og luftmængde.'
+      : '';
+
+  final double virkningsgrad = (!ingenVentilator && luft > 0)
+      ? ((luft / 3600.0) * trykVal) / effekt * 100
+      : 0.0;
+
+  final double selvaerdi = (!ingenVentilator && luft > 0)
+      ? effekt / (luft / 3600.0)
+      : 0.0;
+
+  final double tilbagebetalingstid =
+  (!ingenVentilator && samletOmkostning > 0 && aarsbesparelse > 0)
+      ? samletOmkostning / aarsbesparelse
+      : double.infinity;
+
+  return NovencoResultat(
+    tryk: trykVal,
+    luftmaengde: luft,
+    effekt: effekt,
+    aarsforbrugKWh: ingenVentilator ? 0 : aarsforbrugKWh,
+    omkostning: ingenVentilator ? 0 : omkostning,
+    varenummer: match.varenummer,
+    kommentar: kommentar,
+    virkningsgrad: virkningsgrad,
+    selvaerdi: selvaerdi,
+    tilbagebetalingstid: tilbagebetalingstid,
+    samletOmkostning: ingenVentilator ? 0 : samletOmkostning,
+    aarsbesparelse: ingenVentilator ? 0 : aarsbesparelse,
+  );
+}
+

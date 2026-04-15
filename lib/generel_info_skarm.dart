@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'generel_projekt_info.dart';
 import 'maaledata_skarm.dart';
+import 'anlaegs_data.dart';
+import 'ventilator_samlet_beregning.dart';
+import 'package:ventoptima/services/app_sikkerhed.dart';
+import 'generel_projekt_info.dart' as gpi;
+import 'maaledata_skarm.dart' as mds;
 
 class GenerelInfoSkarm extends StatefulWidget {
   const GenerelInfoSkarm({super.key});
@@ -19,8 +24,34 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
   final _telefonController = TextEditingController();
   final _emailController = TextEditingController();
   final _antalAnlaegController = TextEditingController();
+
   final _elPrisController = TextEditingController(text: '1,20');
   final _varmePrisController = TextEditingController(text: '0,85');
+  String? _valgtKundeType = 'Erhverv';
+  String? _valgtEnergiType = 'Fjernvarme';
+
+  final List<String> _kundeTyper = ['Erhverv', 'Offentlig'];
+  final List<String> _energiTyper = [
+    'Fjernvarme',
+    'Varmepumpe',
+    'Naturgas',
+    'Elvarme'
+  ];
+
+  final Map<String, Map<String, Map<String, String>>> _standardPriser = {
+    'Erhverv': {
+      'Fjernvarme': {'el': '1,20', 'varme': '0,85'},
+      'Varmepumpe': {'el': '1,20', 'varme': '0,45'},
+      'Naturgas': {'el': '1,20', 'varme': '1,10'},
+      'Elvarme': {'el': '1,20', 'varme': '2,00'},
+    },
+    'Offentlig': {
+      'Fjernvarme': {'el': '2,40', 'varme': '1,40'},
+      'Varmepumpe': {'el': '2,40', 'varme': '0,90'},
+      'Naturgas': {'el': '2,40', 'varme': '2,20'},
+      'Elvarme': {'el': '2,40', 'varme': '4,00'},
+    },
+  };
 
   final Map<String, TextEditingController> _drifttimer = {
     'Mandag': TextEditingController(),
@@ -37,12 +68,55 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
   String _valgtDriftperiode = 'Dagtimer';
 
   final List<String> _afdelinger = [
-    'Aalborg', 'Randers', 'Aarhus', 'Horsens', 'Kolding', 'Esbjerg', 'Odense', 'Brøndby',
+    'Aalborg', 'Randers', 'Aarhus', 'Horsens', 'Holstebro','Kolding', 'Esbjerg', 'Odense', 'Brøndby',
   ];
   String? _valgtAfdeling;
+  Key _afdelingKey = UniqueKey();
 
-  final Color _matchingGreen = Color(0xFF34E0A1);
-  final Color _matchingBlue = Color(0xFF006390);
+  final Color _matchingGreen = const Color(0xFF34E0A1);
+  final Color _matchingBlue = const Color(0xFF006390);
+
+  @override
+  void initState() {
+    super.initState();
+    _hentBrugerInfo();
+  }
+
+  Future<void> _hentBrugerInfo() async {
+    try {
+      final bruger = await AppSikkerhed.hentBrugerInfo();
+      setState(() {
+        if (_teknikerNavnController.text.isEmpty) {
+          _teknikerNavnController.text = bruger['navn'] ?? '';
+        }
+        if (_emailController.text.isEmpty) {
+          _emailController.text = bruger['email'] ?? '';
+        }
+        if (_telefonController.text.isEmpty) {
+          _telefonController.text = bruger['telefon'] ?? '';
+        }
+        if (_valgtAfdeling == null) {
+          final afdeling = bruger['afdeling'] ?? '';
+          if (_afdelinger.contains(afdeling)) {
+            _valgtAfdeling = afdeling;
+            _afdelingKey = UniqueKey(); // ✅ Tving dropdown til at genbygge
+          }
+        }
+      });
+    } catch (e) {
+      debugPrint('Kunne ikke hente brugerinfo: $e');
+
+    }
+  }
+
+  Driftstype _mapDriftperiode(String val) {
+    switch (val) {
+      case 'Døgn': return Driftstype.doegn;
+      case 'Dagtimer': return Driftstype.dag;
+      case 'Nattetimer': return Driftstype.nat;
+      default: return Driftstype.doegn;
+    }
+  }
 
   @override
   void dispose() {
@@ -63,6 +137,15 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
     super.dispose();
   }
 
+  void _opdaterPriser() {
+    final el = _standardPriser[_valgtKundeType]![_valgtEnergiType]!['el']!;
+    final varme = _standardPriser[_valgtKundeType]![_valgtEnergiType]!['varme']!;
+    setState(() {
+      _elPrisController.text = el;
+      _varmePrisController.text = varme;
+    });
+  }
+
   void _gaVidere() {
     final driftTimerPrUge = _drifttimer.values
         .map((c) => double.tryParse(c.text.replaceAll(',', '.')) ?? 0)
@@ -70,6 +153,37 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
 
     final elPris = double.tryParse(_elPrisController.text.replaceAll(',', '.')) ?? 1.20;
     final varmePris = double.tryParse(_varmePrisController.text.replaceAll(',', '.')) ?? 0.85;
+    final antal = int.tryParse(_antalAnlaegController.text) ?? 1;
+
+    final alleAnlaeg = List.generate(antal, (_) => AnlaegsData(
+      anlaegsNavn: '',
+      ventMaerkatNr: '',
+      valgtAnlaegstype: '',
+      luftInd: 0,
+      luftUd: 0,
+      trykInd: 0,
+      trykUd: 0,
+      kwInd: 0,
+      kwUd: 0,
+      hzInd: 0,
+      hzUd: 0,
+      elpris: elPris,
+      varmepris: varmePris,
+      valgtTilstand: '',
+      erBeregnetInd: false,
+      erBeregnetUd: false,
+      eksisterendeVarenummerInd: '',
+      eksisterendeVarenummerUd: '',
+      kammerBredde: 0,
+      kammerHoede: 0,
+      kammerLaengde: 0,
+      aarsbesparelse: 0,
+      tilbagebetalingstid: 0,
+      omkostningFoer: 0,
+      omkostningEfter: 0,
+    ));
+
+    final rapportId = DateTime.now().millisecondsSinceEpoch.toString();
 
     final projektInfo = GenerelProjektInfo(
       kundeNavn: _kundeNavnController.text,
@@ -80,18 +194,31 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
       telefon: _telefonController.text,
       email: _emailController.text,
       afdeling: _valgtAfdeling ?? '',
-      antalAnlaeg: int.tryParse(_antalAnlaegController.text) ?? 1,
+      antalAnlaeg: antal,
       elPris: elPris,
       varmePris: varmePris,
       driftTimerPrUge: driftTimerPrUge,
       ugerPerAar: int.tryParse(_ugerPerAarController.text) ?? 52,
-      driftperiode: _valgtDriftperiode,
+      driftstype: _mapDriftperiode(_valgtDriftperiode),
+      index: 0,
+      alleAnlaeg: alleAnlaeg,
+      varmegenvindingsType: gpi.VarmegenvindingType.krydsveksler,
+      rapportDato: DateTime.now(),
+      montorNavn: _teknikerNavnController.text,
+      montorEmail: _emailController.text,
+      rapportId: rapportId,
     );
 
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MaaledataSkarm(projektInfo: projektInfo),
+        builder: (context) => MaaledataSkarm(
+          forslag: <VentilatorOekonomiSamlet>[],
+          projektInfo: projektInfo,
+          index: 0,
+          alleAnlaeg: alleAnlaeg,
+          driftstimer: _drifttimer,
+        ),
       ),
     );
   }
@@ -99,7 +226,7 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
   @override
   Widget build(BuildContext context) {
     final decimalInputFormatter = [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9,\-+]')),
+      FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
     ];
     final intInputFormatter = [
       FilteringTextInputFormatter.digitsOnly,
@@ -130,13 +257,23 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
 
             const SizedBox(height: 24),
             _sektionTitel('Rapporten er udført af'),
-            TextField(controller: _teknikerNavnController, decoration: const InputDecoration(labelText: 'Teknikers navn')),
-            TextField(controller: _telefonController, decoration: const InputDecoration(labelText: 'Telefonnr.')),
-            TextField(controller: _emailController, decoration: const InputDecoration(labelText: 'E-mail')),
+            TextField(
+              controller: _teknikerNavnController,
+              decoration: const InputDecoration(labelText: 'Teknikers navn'),
+            ),
+            TextField(
+              controller: _telefonController,
+              decoration: const InputDecoration(labelText: 'Telefonnr.'),
+            ),
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(labelText: 'E-mail'),
+            ),
 
             const SizedBox(height: 24),
             _sektionTitel('Afdeling'),
             DropdownButtonFormField<String>(
+              key: _afdelingKey,
               value: _valgtAfdeling,
               decoration: const InputDecoration(labelText: 'Vælg afdeling'),
               items: _afdelinger.map((afdeling) {
@@ -150,12 +287,36 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
             TextField(
               controller: _antalAnlaegController,
               decoration: const InputDecoration(labelText: 'Antal anlæg'),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
               inputFormatters: intInputFormatter,
             ),
 
             const SizedBox(height: 24),
             _sektionTitel('Energipriser'),
+            DropdownButtonFormField<String>(
+              value: _valgtKundeType,
+              decoration: const InputDecoration(labelText: 'Kundetype'),
+              items: _kundeTyper.map((type) =>
+                  DropdownMenuItem(value: type, child: Text(type))).toList(),
+              onChanged: (val) {
+                setState(() {
+                  _valgtKundeType = val;
+                  _opdaterPriser();
+                });
+              },
+            ),
+            DropdownButtonFormField<String>(
+              value: _valgtEnergiType,
+              decoration: const InputDecoration(labelText: 'Varmeleverandør'),
+              items: _energiTyper.map((type) =>
+                  DropdownMenuItem(value: type, child: Text(type))).toList(),
+              onChanged: (val) {
+                setState(() {
+                  _valgtEnergiType = val;
+                  _opdaterPriser();
+                });
+              },
+            ),
             TextField(
               controller: _elPrisController,
               decoration: const InputDecoration(labelText: 'El-pris (kr./kWh)'),
@@ -174,7 +335,7 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
             ..._drifttimer.entries.map((entry) {
               return TextField(
                 controller: entry.value,
-                decoration: InputDecoration(labelText: '${entry.key}'),
+                decoration: InputDecoration(labelText: entry.key),
                 keyboardType: TextInputType.text,
                 inputFormatters: decimalInputFormatter,
               );

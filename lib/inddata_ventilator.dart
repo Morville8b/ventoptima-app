@@ -5,14 +5,16 @@ class VentilatorVisning extends StatefulWidget {
   final String anlaegstype;
 
   final TextEditingController trykGamleFiltreIndController;
-  final TextEditingController antalFiltreIndController;
+  final TextEditingController antalHeleFiltreIndController;
+  final TextEditingController antalHalveFiltreIndController;
   final TextEditingController trykFoerIndController;
   final TextEditingController trykEfterIndController;
   final TextEditingController hzIndController;
   final TextEditingController effektIndController;
 
   final TextEditingController trykGamleFiltreUdController;
-  final TextEditingController antalFiltreUdController;
+  final TextEditingController antalHeleFiltreUdController;
+  final TextEditingController antalHalveFiltreUdController;
   final TextEditingController trykFoerUdController;
   final TextEditingController trykEfterUdController;
   final TextEditingController hzUdController;
@@ -25,13 +27,15 @@ class VentilatorVisning extends StatefulWidget {
     super.key,
     required this.anlaegstype,
     required this.trykGamleFiltreIndController,
-    required this.antalFiltreIndController,
+    required this.antalHeleFiltreIndController,
+    required this.antalHalveFiltreIndController,
     required this.trykFoerIndController,
     required this.trykEfterIndController,
     required this.hzIndController,
     required this.effektIndController,
     required this.trykGamleFiltreUdController,
-    required this.antalFiltreUdController,
+    required this.antalHeleFiltreUdController,
+    required this.antalHalveFiltreUdController,
     required this.trykFoerUdController,
     required this.trykEfterUdController,
     required this.hzUdController,
@@ -59,42 +63,15 @@ class _VentilatorVisningState extends State<VentilatorVisning> {
     widget.trykEfterUdController.addListener(_opdaterTryk);
   }
 
-  void _visPopup(String titel, String besked) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-          backgroundColor: const Color(0xFF34E0A1),
-          title: Text(titel, style: const TextStyle(color: Color(0xFF006390))),
-          content: Text(besked, style: const TextStyle(color: Color(0xFF006390))),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK', style: TextStyle(color: Color(0xFF006390))),
-            ),
-          ],
-        ),
-      );
-    });
-  }
-
   void _opdaterTryk() {
-    final trykFoerIndText = widget.trykFoerIndController.text;
-    final trykFoerInd = double.tryParse(trykFoerIndText.replaceAll(',', '.')) ?? 0;
-
-    final trykFoerUdText = widget.trykFoerUdController.text;
-    final trykFoerUd = double.tryParse(trykFoerUdText.replaceAll(',', '.')) ?? 0;
+    final trykFoerInd = double.tryParse(widget.trykFoerIndController.text.replaceAll(',', '.')) ?? 0;
+    final trykFoerUd = double.tryParse(widget.trykFoerUdController.text.replaceAll(',', '.')) ?? 0;
 
     setState(() {
-      visFejlInd = trykFoerIndText.isNotEmpty && !trykFoerIndText.trim().startsWith('-');
-      visFejlUd = trykFoerUdText.isNotEmpty && !trykFoerUdText.trim().startsWith('-');
-
-      if (visFejlInd) {
-        _visPopup('Manglende minustegn', 'Indblæsning: Husk at sætte minus foran sugtrykket før ventilatoren.');
-      }
-      if (visFejlUd) {
-        _visPopup('Manglende minustegn', 'Udsugning: Husk at sætte minus foran sugtrykket før ventilatoren.');
-      }
+      visFejlInd = widget.trykFoerIndController.text.isNotEmpty &&
+          !widget.trykFoerIndController.text.trim().startsWith('-');
+      visFejlUd = widget.trykFoerUdController.text.isNotEmpty &&
+          !widget.trykFoerUdController.text.trim().startsWith('-');
 
       samletTrykInd = trykFoerInd.abs() +
           (double.tryParse(widget.trykEfterIndController.text.replaceAll(',', '.')) ?? 0).abs();
@@ -108,7 +85,6 @@ class _VentilatorVisningState extends State<VentilatorVisning> {
 
   @override
   Widget build(BuildContext context) {
-    final textKeyboard = TextInputType.text;
     final inputFormatter = [
       FilteringTextInputFormatter.allow(RegExp(r'^[-+]?[0-9]{0,5}(,[0-9]{0,2})?')),
     ];
@@ -118,12 +94,6 @@ class _VentilatorVisningState extends State<VentilatorVisning> {
         labelText: label,
         errorText: visFejl ? 'Husk minus foran sugtryk' : null,
         border: const UnderlineInputBorder(),
-        enabledBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey),
-        ),
-        focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Color(0xFF34E0A1), width: 2),
-        ),
       );
     }
 
@@ -135,28 +105,43 @@ class _VentilatorVisningState extends State<VentilatorVisning> {
           TextField(
             controller: widget.trykGamleFiltreIndController,
             decoration: dekoration('Tryktab over gamle filtre (Pa)'),
-            keyboardType: textKeyboard,
+            keyboardType: TextInputType.text,
             inputFormatters: inputFormatter,
           ),
           const SizedBox(height: 8),
-          TextField(
-            controller: widget.antalFiltreIndController,
-            decoration: dekoration('Antal filtre'),
-            keyboardType: textKeyboard,
-            inputFormatters: inputFormatter,
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: widget.antalHeleFiltreIndController,
+                  decoration: dekoration('Antal hele filtre'),
+                  keyboardType: TextInputType.text,
+                  inputFormatters: inputFormatter,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  controller: widget.antalHalveFiltreIndController,
+                  decoration: dekoration('Antal halve filtre'),
+                  keyboardType: TextInputType.text,
+                  inputFormatters: inputFormatter,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           TextField(
             controller: widget.trykFoerIndController,
             decoration: dekoration('Tryk før ventilator (Pa)', visFejl: visFejlInd),
-            keyboardType: textKeyboard,
+            keyboardType: TextInputType.text,
             inputFormatters: inputFormatter,
           ),
           const SizedBox(height: 8),
           TextField(
             controller: widget.trykEfterIndController,
             decoration: dekoration('Tryk efter ventilator (Pa)'),
-            keyboardType: textKeyboard,
+            keyboardType: TextInputType.text,
             inputFormatters: inputFormatter,
           ),
           Padding(
@@ -167,14 +152,14 @@ class _VentilatorVisningState extends State<VentilatorVisning> {
           TextField(
             controller: widget.hzIndController,
             decoration: dekoration('Frekvens (Hz)'),
-            keyboardType: textKeyboard,
+            keyboardType: TextInputType.text,
             inputFormatters: inputFormatter,
           ),
           const SizedBox(height: 8),
           TextField(
             controller: widget.effektIndController,
             decoration: dekoration('Effekt (kW)'),
-            keyboardType: textKeyboard,
+            keyboardType: TextInputType.text,
             inputFormatters: inputFormatter,
           ),
           const Divider(height: 32),
@@ -184,28 +169,43 @@ class _VentilatorVisningState extends State<VentilatorVisning> {
           TextField(
             controller: widget.trykGamleFiltreUdController,
             decoration: dekoration('Tryktab over gamle filtre (Pa)'),
-            keyboardType: textKeyboard,
+            keyboardType: TextInputType.text,
             inputFormatters: inputFormatter,
           ),
           const SizedBox(height: 8),
-          TextField(
-            controller: widget.antalFiltreUdController,
-            decoration: dekoration('Antal filtre'),
-            keyboardType: textKeyboard,
-            inputFormatters: inputFormatter,
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: widget.antalHeleFiltreUdController,
+                  decoration: dekoration('Antal hele filtre'),
+                  keyboardType: TextInputType.text,
+                  inputFormatters: inputFormatter,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  controller: widget.antalHalveFiltreUdController,
+                  decoration: dekoration('Antal halve filtre'),
+                  keyboardType: TextInputType.text,
+                  inputFormatters: inputFormatter,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           TextField(
             controller: widget.trykFoerUdController,
             decoration: dekoration('Tryk før ventilator (Pa)', visFejl: visFejlUd),
-            keyboardType: textKeyboard,
+            keyboardType: TextInputType.text,
             inputFormatters: inputFormatter,
           ),
           const SizedBox(height: 8),
           TextField(
             controller: widget.trykEfterUdController,
             decoration: dekoration('Tryk efter ventilator (Pa)'),
-            keyboardType: textKeyboard,
+            keyboardType: TextInputType.text,
             inputFormatters: inputFormatter,
           ),
           Padding(
@@ -216,14 +216,14 @@ class _VentilatorVisningState extends State<VentilatorVisning> {
           TextField(
             controller: widget.hzUdController,
             decoration: dekoration('Frekvens (Hz)'),
-            keyboardType: textKeyboard,
+            keyboardType: TextInputType.text,
             inputFormatters: inputFormatter,
           ),
           const SizedBox(height: 8),
           TextField(
             controller: widget.effektUdController,
             decoration: dekoration('Effekt (kW)'),
-            keyboardType: textKeyboard,
+            keyboardType: TextInputType.text,
             inputFormatters: inputFormatter,
           ),
         ],

@@ -166,6 +166,14 @@ class LuftmaengdeVisning extends StatelessWidget {
             decoration: const InputDecoration(labelText: 'Tryktab over ventilatoren (Pa)'),
             keyboardType: TextInputType.text,
             inputFormatters: formatter,
+            onSubmitted: (_) {
+              final double k = double.tryParse(kVaerdiController.text.replaceAll(',', '.')) ?? 0;
+              final double dp = double.tryParse(trykDifferensController.text.replaceAll(',', '.')) ?? 0;
+              if (k > 0 && dp > 0) {
+                final double luft = k * sqrt(dp);
+                maaltController.text = luft.toStringAsFixed(0);
+              }
+            },
           ),
         ],
 
@@ -195,6 +203,15 @@ class LuftmaengdeVisning extends StatelessWidget {
             decoration: const InputDecoration(labelText: 'Målt effekt (kW)'),
             keyboardType: TextInputType.text,
             inputFormatters: formatter,
+            onSubmitted: (_) {
+              final double qn = double.tryParse(maksLuftController.text.replaceAll(',', '.')) ?? 0;
+              final double pn = double.tryParse(maksEffektController.text.replaceAll(',', '.')) ?? 0;
+              final double p = double.tryParse(effektMaaltController.text.replaceAll(',', '.')) ?? 0;
+              if (qn > 0 && pn > 0 && p > 0) {
+                final double luft = qn * pow(p / pn, 1 / 3);
+                maaltController.text = luft.toStringAsFixed(0);
+              }
+            },
           ),
         ],
 

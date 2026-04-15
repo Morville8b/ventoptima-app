@@ -1,5 +1,8 @@
-import 'generel_projekt_info.dart';
 import 'package:flutter/material.dart';
+import 'generel_projekt_info.dart'; // ✅ herfra henter vi Driftstype
+import 'beregning_varmeforbrug.dart';
+import 'besparelseforslag_skarm.dart';
+
 class MaaledataSkarm extends StatefulWidget {
   final GenerelProjektInfo projektInfo;
 
@@ -10,20 +13,32 @@ class MaaledataSkarm extends StatefulWidget {
 }
 
 class _MaaledataSkarmState extends State<MaaledataSkarm> {
-  final TextEditingController _trykFoerIndController = TextEditingController();
-  final TextEditingController _trykEfterIndController = TextEditingController();
-  final TextEditingController _trykFoerUdController = TextEditingController();
-  final TextEditingController _trykEfterUdController = TextEditingController();
-  final TextEditingController _kwIndController = TextEditingController();
-  final TextEditingController _kwUdController = TextEditingController();
-  final TextEditingController _hzIndController = TextEditingController();
-  final TextEditingController _hzUdController = TextEditingController();
-  final TextEditingController _luftmaengdeIndController = TextEditingController();
-  final TextEditingController _luftmaengdeUdController = TextEditingController();
-  final TextEditingController _kVaerdiIndController = TextEditingController();
-  final TextEditingController _trykDiffIndBeregnetController = TextEditingController();
-  final TextEditingController _kVaerdiUdController = TextEditingController();
-  final TextEditingController _trykDiffUdBeregnetController = TextEditingController();
+  // Controllers
+  final _trykFoerIndController = TextEditingController();
+  final _trykEfterIndController = TextEditingController();
+  final _trykFoerUdController = TextEditingController();
+  final _trykEfterUdController = TextEditingController();
+  final _kwIndController = TextEditingController();
+  final _kwUdController = TextEditingController();
+  final _hzIndController = TextEditingController();
+  final _hzUdController = TextEditingController();
+
+  final _luftIndCtrl = TextEditingController();
+  final _luftUdCtrl = TextEditingController();
+  final _friskluftTempCtrl = TextEditingController();
+  final _tempIndEfterGenvindingCtrl = TextEditingController();
+  final _tempIndEfterVarmefladeCtrl = TextEditingController();
+  final _tempUdCtrl = TextEditingController();
+  final _tempAfkastCtrl = TextEditingController();
+  final _driftstimerCtrl = TextEditingController();
+  final _driftstypeCtrl = TextEditingController();
+  final _varmegenvindingsTypeCtrl = TextEditingController();
+
+  // 🔥 Manglende controllers fra fejl-log
+  final _aarsVirkningsgradCtrl = TextEditingController();
+  final _varmePrisCtrl = TextEditingController();
+  String _valgtAnlaegstype = "Ventilationsanlæg";
+  String _valgtTilstand = '1';
 
   bool _beregnUdFraKVaerdi = false;
 
@@ -37,13 +52,71 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
     _kwUdController.dispose();
     _hzIndController.dispose();
     _hzUdController.dispose();
-    _luftmaengdeIndController.dispose();
-    _luftmaengdeUdController.dispose();
-    _kVaerdiIndController.dispose();
-    _trykDiffIndBeregnetController.dispose();
-    _kVaerdiUdController.dispose();
-    _trykDiffUdBeregnetController.dispose();
+    _luftIndCtrl.dispose();
+    _luftUdCtrl.dispose();
+    _friskluftTempCtrl.dispose();
+    _tempIndEfterGenvindingCtrl.dispose();
+    _tempIndEfterVarmefladeCtrl.dispose();
+    _tempUdCtrl.dispose();
+    _tempAfkastCtrl.dispose();
+    _driftstimerCtrl.dispose();
+    _driftstypeCtrl.dispose();
+    _varmegenvindingsTypeCtrl.dispose();
+    _aarsVirkningsgradCtrl.dispose();
+    _varmePrisCtrl.dispose();
     super.dispose();
+  }
+
+  // ✅ Bruger nu kun Driftstype fra generel_projekt_info.dart
+  Driftstype _mapDriftstype(String input) {
+    switch (input.toLowerCase()) {
+      case 'dag':
+      case 'dagtimer':
+        return Driftstype.dag;
+      case 'nat':
+      case 'nattetimer':
+        return Driftstype.nat;
+      default:
+        return Driftstype.doegn;
+    }
+  }
+
+  void _beregnOgNaviger() {
+    final resultat = beregnVarmeforbrugOgVirkningsgrad(
+      anlaegsType: _valgtAnlaegstype,
+      luftInd: double.tryParse(_luftIndCtrl.text.replaceAll(',', '.')) ?? 0,
+      luftUd: double.tryParse(_luftUdCtrl.text.replaceAll(',', '.')) ?? 0,
+      driftstimer: double.tryParse(_driftstimerCtrl.text.replaceAll(',', '.')) ?? 0,
+      friskluftTemp: double.tryParse(_friskluftTempCtrl.text.replaceAll(',', '.')) ?? 0,
+      tempUd: double.tryParse(_tempUdCtrl.text.replaceAll(',', '.')) ?? 0,
+      tempIndEfterGenvinding: double.tryParse(_tempIndEfterGenvindingCtrl.text.replaceAll(',', '.')) ?? 0,
+      tempIndEfterVarmeflade: double.tryParse(_tempIndEfterVarmefladeCtrl.text.replaceAll(',', '.')) ?? 0,
+      varmePris: double.tryParse(_varmePrisCtrl.text.replaceAll(',', '.')) ?? widget.projektInfo.varmePris,
+
+      // optionals
+      tempAfkast: double.tryParse(_tempAfkastCtrl.text.replaceAll(',', '.')),
+      varmegenvindingsType: _varmegenvindingsTypeCtrl.text.isNotEmpty
+          ? _varmegenvindingsTypeCtrl.text
+          : null,
+      driftstype: _mapDriftstype(_driftstypeCtrl.text), // ✅ mapper til enum
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BesparelseForslagSkarm(
+          alleForslag: [], // TODO: udfyld forslag
+          elPris: widget.projektInfo.elPris,
+          varmePris: widget.projektInfo.varmePris,
+          projektInfo: widget.projektInfo,
+          anlaegsNavn: "Mit anlæg", // TODO: sæt korrekt navn
+          varmeforbrugResultat: resultat,
+          friskluftTemp: double.tryParse(_friskluftTempCtrl.text.replaceAll(',', '.')) ?? 0,
+          anlaegsType: _valgtAnlaegstype,
+          valgtTilstand: _valgtTilstand,
+        ),
+      ),
+    );
   }
 
   @override
@@ -55,64 +128,23 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Kunde: ${widget.projektInfo.kundeNavn}'),
-            Text('Adresse: ${widget.projektInfo.adresse}'),
-            Text('Postnr/By: ${widget.projektInfo.postnrBy}'),
-            Text('Att: ${widget.projektInfo.att}'),
-            const SizedBox(height: 16),
-            const Text('Teknikeroplysninger:', style: TextStyle(fontWeight: FontWeight.bold)),
-            Text('Navn: ${widget.projektInfo.teknikerNavn}'),
-            Text('Telefon: ${widget.projektInfo.telefon}'),
-            Text('E-mail: ${widget.projektInfo.email}'),
-            const SizedBox(height: 16),
-            const Text('Projektoplysninger:', style: TextStyle(fontWeight: FontWeight.bold)),
-            Text('Antal anlæg: ${widget.projektInfo.antalAnlaeg}'),
-            Text('Elpris: ${widget.projektInfo.elPris} kr/kWh'),
-            Text('Varmepris: ${widget.projektInfo.varmePris} kr/kWh'),
-            Text('Uger per år: ${widget.projektInfo.ugerPerAar}'),
-            Text('Driftperiode: ${widget.projektInfo.driftperiode}'),
-            const SizedBox(height: 16),
-            const Text('Drifttimer pr. uge:', style: TextStyle(fontWeight: FontWeight.bold)),
-            for (int i = 0; i < widget.projektInfo.driftTimerPrUge.length; i++)
-              Text('Dag ${i + 1}: ${widget.projektInfo.driftTimerPrUge[i]} timer'),
+            TextField(controller: _luftIndCtrl, decoration: const InputDecoration(labelText: 'Indblæsning (m³/h)')),
+            TextField(controller: _luftUdCtrl, decoration: const InputDecoration(labelText: 'Udsugning (m³/h)')),
+            TextField(controller: _friskluftTempCtrl, decoration: const InputDecoration(labelText: 'Friskluft (°C)')),
+            TextField(controller: _tempIndEfterGenvindingCtrl, decoration: const InputDecoration(labelText: 'Efter genvinding (°C)')),
+            TextField(controller: _tempIndEfterVarmefladeCtrl, decoration: const InputDecoration(labelText: 'Efter varmeflade (°C)')),
+            TextField(controller: _tempUdCtrl, decoration: const InputDecoration(labelText: 'Udsugning (°C)')),
+            TextField(controller: _tempAfkastCtrl, decoration: const InputDecoration(labelText: 'Afkast (°C)')),
+            TextField(controller: _aarsVirkningsgradCtrl, decoration: const InputDecoration(labelText: 'Årsvirkningsgrad (%)')),
+            TextField(controller: _varmePrisCtrl, decoration: const InputDecoration(labelText: 'Varmepris (kr/kWh)')),
+            TextField(controller: _driftstimerCtrl, decoration: const InputDecoration(labelText: 'Driftstimer')),
+            TextField(controller: _driftstypeCtrl, decoration: const InputDecoration(labelText: 'Driftstype (dag/dagTimer/nat/døgn)')),
+            TextField(controller: _varmegenvindingsTypeCtrl, decoration: const InputDecoration(labelText: 'Varmegenvindings-type')),
 
             const SizedBox(height: 24),
-            const Text('Ventilatordata – Indblæsning', style: TextStyle(fontWeight: FontWeight.bold)),
-            TextField(controller: _trykFoerIndController, decoration: const InputDecoration(labelText: 'Tryk før ventilator (Pa)')),
-            TextField(controller: _trykEfterIndController, decoration: const InputDecoration(labelText: 'Tryk efter ventilator (Pa)')),
-            TextField(controller: _kwIndController, decoration: const InputDecoration(labelText: 'Effekt (kW)')),
-            TextField(controller: _hzIndController, decoration: const InputDecoration(labelText: 'Driftfrekvens (Hz)')),
-
-            const SizedBox(height: 24),
-            const Text('Ventilatordata – Udsugning', style: TextStyle(fontWeight: FontWeight.bold)),
-            TextField(controller: _trykFoerUdController, decoration: const InputDecoration(labelText: 'Tryk før ventilator (Pa)')),
-            TextField(controller: _trykEfterUdController, decoration: const InputDecoration(labelText: 'Tryk efter ventilator (Pa)')),
-            TextField(controller: _kwUdController, decoration: const InputDecoration(labelText: 'Effekt (kW)')),
-            TextField(controller: _hzUdController, decoration: const InputDecoration(labelText: 'Driftfrekvens (Hz)')),
-
-            const SizedBox(height: 24),
-            const Text('Luftmængde', style: TextStyle(fontWeight: FontWeight.bold)),
-            TextField(controller: _luftmaengdeIndController, decoration: const InputDecoration(labelText: 'Indblæsning målt (m³/h)')),
-            TextField(controller: _luftmaengdeUdController, decoration: const InputDecoration(labelText: 'Udsugning målt (m³/h)')),
-
-            SwitchListTile(
-              title: const Text('Beregn ud fra K-værdi og trykdifferens?'),
-              value: _beregnUdFraKVaerdi,
-              onChanged: (val) => setState(() => _beregnUdFraKVaerdi = val),
-            ),
-            if (_beregnUdFraKVaerdi) ...[
-              TextField(controller: _kVaerdiIndController, decoration: const InputDecoration(labelText: 'K-værdi indblæsning')),
-              TextField(controller: _trykDiffIndBeregnetController, decoration: const InputDecoration(labelText: 'Trykdifferens (Pa)')),
-              TextField(controller: _kVaerdiUdController, decoration: const InputDecoration(labelText: 'K-værdi udsugning')),
-              TextField(controller: _trykDiffUdBeregnetController, decoration: const InputDecoration(labelText: 'Trykdifferens (Pa)')),
-            ],
-
-            const SizedBox(height: 32),
             Center(
               child: ElevatedButton(
-                onPressed: () {
-                  // Tilføj navigering eller beregning her
-                },
+                onPressed: _beregnOgNaviger,
                 child: const Text('Beregn'),
               ),
             ),
