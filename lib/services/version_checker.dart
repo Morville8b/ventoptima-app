@@ -3,7 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class VersionChecker {
-  static const storage = FlutterSecureStorage();
+  static const storage = FlutterSecureStorage(iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock));
   static final supabase = Supabase.instance.client;
 
   /// Tjek om der er en ny version tilgængelig

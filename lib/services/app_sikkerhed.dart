@@ -8,7 +8,7 @@ class AppSikkerhed {
   static final DateTime UDLOEB = DateTime(2026, 6, 30);
   static const int DAGE_MELLEM_VALIDERING = 7;
 
-  static const storage = FlutterSecureStorage();
+  static const storage = FlutterSecureStorage(iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock));
   static final supabase = Supabase.instance.client;
 
   static bool erUdloebet() {

@@ -1,7 +1,7 @@
 name: ventoptima
 description: "App til energioptimering af ventilationsanlæg"
 publish_to: 'none'
-version: 1.0.20+31
+version: 1.0.24+34
 environment:
   sdk: ">=3.7.2 <4.0.0"
 dependencies:
@@ -57,7 +57,7 @@ msix_config:
   publisher_display_name: VentOptima ApS
   identity_name: VentOptimaApS.VentOptima
   publisher: CN=716FD48F-966B-4E48-A717-A279EC7EB992
-  msix_version: 1.0.21.0
+  msix_version: 1.0.24.0
   logo_path: assets/images/morville_logo.png
   capabilities: internetClient
   store: true
