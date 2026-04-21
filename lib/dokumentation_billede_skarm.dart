@@ -496,7 +496,7 @@ class _DokumentationBilledeSkarmState
 class _DokumentationsElement {
   final File billede;
   final TextEditingController beskrivelseController;
-  double billedeHoejde;  // 🆕 Tilføjet
+  double billedeHoejde = 200.0;   // 🆕 Tilføjet
 
   _DokumentationsElement({
     required this.billede,

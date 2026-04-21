@@ -47,12 +47,16 @@ class AppSikkerhed {
       );
 
       if (response.user != null) {
-        await storage.write(key: 'bruger_navn', value: fuldeNavn);
-        await storage.write(key: 'medarbejder_nr', value: medarbejderNr);
-        await storage.write(key: 'bruger_email', value: email);
-        await storage.write(key: 'bruger_telefon', value: telefon);
-        await storage.write(key: 'bruger_afdeling', value: afdeling);
-        await _opdaterSidsteValidering();
+        try {
+          await storage.write(key: 'bruger_navn', value: fuldeNavn);
+          await storage.write(key: 'medarbejder_nr', value: medarbejderNr);
+          await storage.write(key: 'bruger_email', value: email);
+          await storage.write(key: 'bruger_telefon', value: telefon);
+          await storage.write(key: 'bruger_afdeling', value: afdeling);
+          await _opdaterSidsteValidering();
+        } catch (e) {
+          debugPrint('Storage write fejlede: $e');
+        }
 
         return {
           'success': true,
@@ -84,12 +88,16 @@ class AppSikkerhed {
 
       if (response.user != null) {
         final userData = response.user!.userMetadata;
-        await storage.write(key: 'bruger_navn', value: userData?['full_name']);
-        await storage.write(key: 'medarbejder_nr', value: userData?['medarbejder_nr']);
-        await storage.write(key: 'bruger_email', value: email);
-        await storage.write(key: 'bruger_telefon', value: userData?['telefon']);
-        await storage.write(key: 'bruger_afdeling', value: userData?['afdeling']);
-        await _opdaterSidsteValidering();
+        try {
+          await storage.write(key: 'bruger_navn', value: userData?['full_name']);
+          await storage.write(key: 'medarbejder_nr', value: userData?['medarbejder_nr']);
+          await storage.write(key: 'bruger_email', value: email);
+          await storage.write(key: 'bruger_telefon', value: userData?['telefon']);
+          await storage.write(key: 'bruger_afdeling', value: userData?['afdeling']);
+          await _opdaterSidsteValidering();
+        } catch (e) {
+          debugPrint('Storage write fejlede: $e');
+        }
 
         return {'success': true, 'message': 'Login succesfuldt'};
       } else {
@@ -137,7 +145,11 @@ class AppSikkerhed {
     try {
       final session = supabase.auth.currentSession;
       if (session != null && !session.isExpired) {
-        await _opdaterSidsteValidering();
+        try {
+          await _opdaterSidsteValidering();
+        } catch (e) {
+          debugPrint('Opdater validering fejlede: $e');
+        }
         return true;
       }
     } catch (e) {
@@ -154,8 +166,16 @@ class AppSikkerhed {
   }
 
   static Future<void> signOut() async {
-    await supabase.auth.signOut();
-    await storage.deleteAll();
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      debugPrint('SignOut fejlede: $e');
+    }
+    try {
+      await storage.deleteAll();
+    } catch (e) {
+      debugPrint('Storage deleteAll fejlede: $e');
+    }
   }
 
   static Future<bool> skalGenvalideres() async {
@@ -171,7 +191,6 @@ class AppSikkerhed {
   // ═══════════════════════════════════════════════════════════
 
   static Future<Map<String, String?>> hentBrugerInfo() async {
-    // ✅ Tving refresh af brugerdata fra Supabase så seneste metadata hentes
     try {
       await supabase.auth.refreshSession();
     } catch (e) {
@@ -181,11 +200,14 @@ class AppSikkerhed {
     final user = supabase.auth.currentUser;
 
     if (user != null && user.userMetadata != null) {
-      // ✅ Opdater lokal cache med de nyeste værdier
-      await storage.write(key: 'bruger_navn', value: user.userMetadata?['full_name']);
-      await storage.write(key: 'bruger_email', value: user.email);
-      await storage.write(key: 'bruger_telefon', value: user.userMetadata?['telefon']);
-      await storage.write(key: 'bruger_afdeling', value: user.userMetadata?['afdeling']);
+      try {
+        await storage.write(key: 'bruger_navn', value: user.userMetadata?['full_name']);
+        await storage.write(key: 'bruger_email', value: user.email);
+        await storage.write(key: 'bruger_telefon', value: user.userMetadata?['telefon']);
+        await storage.write(key: 'bruger_afdeling', value: user.userMetadata?['afdeling']);
+      } catch (e) {
+        debugPrint('Storage write fejlede: $e');
+      }
 
       return {
         'navn': user.userMetadata?['full_name'],
@@ -196,14 +218,24 @@ class AppSikkerhed {
       };
     }
 
-    // Fallback til lokal cache (offline)
-    return {
-      'navn': await storage.read(key: 'bruger_navn'),
-      'medarbejderNr': await storage.read(key: 'medarbejder_nr'),
-      'email': await storage.read(key: 'bruger_email'),
-      'telefon': await storage.read(key: 'bruger_telefon'),
-      'afdeling': await storage.read(key: 'bruger_afdeling'),
-    };
+    try {
+      return {
+        'navn': await storage.read(key: 'bruger_navn'),
+        'medarbejderNr': await storage.read(key: 'medarbejder_nr'),
+        'email': await storage.read(key: 'bruger_email'),
+        'telefon': await storage.read(key: 'bruger_telefon'),
+        'afdeling': await storage.read(key: 'bruger_afdeling'),
+      };
+    } catch (e) {
+      debugPrint('Storage read fejlede: $e');
+      return {
+        'navn': null,
+        'medarbejderNr': null,
+        'email': null,
+        'telefon': null,
+        'afdeling': null,
+      };
+    }
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -233,17 +265,26 @@ class AppSikkerhed {
   // ═══════════════════════════════════════════════════════════
 
   static Future<void> _opdaterSidsteValidering() async {
-    await storage.write(
-      key: 'sidste_validering',
-      value: DateTime.now().toIso8601String(),
-    );
+    try {
+      await storage.write(
+        key: 'sidste_validering',
+        value: DateTime.now().toIso8601String(),
+      );
+    } catch (e) {
+      debugPrint('Opdater validering fejlede: $e');
+    }
   }
 
   static Future<DateTime?> _hentSidsteValidering() async {
-    final dateStr = await storage.read(key: 'sidste_validering');
-    if (dateStr != null) {
-      return DateTime.parse(dateStr);
+    try {
+      final dateStr = await storage.read(key: 'sidste_validering');
+      if (dateStr != null) {
+        return DateTime.parse(dateStr);
+      }
+      return null;
+    } catch (e) {
+      debugPrint('Hent validering fejlede: $e');
+      return null;
     }
-    return null;
   }
 }
