@@ -9,8 +9,8 @@ Future<bool> visDokumentationsDialog(BuildContext context, String valgtTilstand)
       : 'Billede og kort beskrivelse er påkrævet for denne tilstand. '
       'Vedhæft dokumentation for at fortsætte.';
 
-  const Color _matchingGreen = Color(0xFF34E0A1);
-  const Color _matchingBlue = Color(0xFF006390);
+  const Color matchingGreen = Color(0xFF34E0A1);
+  const Color matchingBlue = Color(0xFF006390);
 
   return await Navigator.of(context).push<bool>(
     PageRouteBuilder(
@@ -51,13 +51,13 @@ Future<bool> visDokumentationsDialog(BuildContext context, String valgtTilstand)
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: _matchingGreen.withOpacity(0.1),
+                        color: matchingGreen.withOpacity(0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         kanSpringeOver ? Icons.photo_camera : Icons.warning,
                         size: 40,
-                        color: kanSpringeOver ? _matchingBlue : Colors.orange,
+                        color: kanSpringeOver ? matchingBlue : Colors.orange,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -68,7 +68,7 @@ Future<bool> visDokumentationsDialog(BuildContext context, String valgtTilstand)
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: _matchingBlue,
+                        color: matchingBlue,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -95,7 +95,7 @@ Future<bool> visDokumentationsDialog(BuildContext context, String valgtTilstand)
                             child: ElevatedButton(
                               onPressed: () => Navigator.of(context).pop(true),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: _matchingGreen,
+                                backgroundColor: matchingGreen,
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -105,7 +105,7 @@ Future<bool> visDokumentationsDialog(BuildContext context, String valgtTilstand)
                               child: const Text(
                                 'Vedhæft',
                                 style: TextStyle(
-                                  color: _matchingBlue,
+                                  color: matchingBlue,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -120,7 +120,7 @@ Future<bool> visDokumentationsDialog(BuildContext context, String valgtTilstand)
                               onPressed: () => Navigator.of(context).pop(false),
                               style: OutlinedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 16),
-                                side: const BorderSide(color: _matchingGreen, width: 2),
+                                side: const BorderSide(color: matchingGreen, width: 2),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -128,7 +128,7 @@ Future<bool> visDokumentationsDialog(BuildContext context, String valgtTilstand)
                               child: const Text(
                                 'Spring over',
                                 style: TextStyle(
-                                  color: _matchingBlue,
+                                  color: matchingBlue,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -144,7 +144,7 @@ Future<bool> visDokumentationsDialog(BuildContext context, String valgtTilstand)
                         child: ElevatedButton(
                           onPressed: () => Navigator.of(context).pop(true),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: _matchingGreen,
+                            backgroundColor: matchingGreen,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -154,7 +154,7 @@ Future<bool> visDokumentationsDialog(BuildContext context, String valgtTilstand)
                           child: const Text(
                             'Vedhæft',
                             style: TextStyle(
-                              color: _matchingBlue,
+                              color: matchingBlue,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),

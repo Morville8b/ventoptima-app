@@ -1,6 +1,5 @@
 // Denne fil indeholder struktur og komplet data for Ebmpapst ventilatorer.
 import 'ventilator_samlet_beregning.dart';
-import 'ebmpapst_priser.dart';
 
 class VentilatorData {
   final int tryk;

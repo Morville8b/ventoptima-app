@@ -161,7 +161,7 @@ Future<void> visSendRapportPopup(
                                 BorderSide(color: matchingGreen, width: 1.5),
                               ),
                             ),
-                            value: valgtServiceleder,
+                            initialValue: valgtServiceleder,
                             items: valgteLedere.keys.map((navn) {
                               return DropdownMenuItem(value: navn, child: Text(navn));
                             }).toList(),
@@ -607,7 +607,7 @@ Future<void> _sendViaSupabase({
     final kundeNavn = projektInfo.kundeNavn.replaceAll(RegExp(r'[^\w\s-]'), '');
     final kundePath = '$timestamp/${kundeNavn}_kunde.pdf';
     final tekniskPath = '$timestamp/${kundeNavn}_teknisk.pdf';
-    final ventoptimaPath = '$timestamp/${kundeNavn}.ventoptima';
+    final ventoptimaPath = '$timestamp/$kundeNavn.ventoptima';
 
     debugPrint('📤 Uploader PDF-filer til Supabase...');
 
@@ -784,10 +784,10 @@ Bravida VentOptima
 
       // 🗑️ Ryd op efter succesfuld afsendelse
       try {
-        if (tempKundeFil != null && await tempKundeFil.exists()) {
+        if (await tempKundeFil.exists()) {
           await tempKundeFil.delete();
         }
-        if (tempTekniskFil != null && await tempTekniskFil.exists()) {
+        if (await tempTekniskFil.exists()) {
           await tempTekniskFil.delete();
         }
       } catch (e) {

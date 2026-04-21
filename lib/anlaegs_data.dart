@@ -1,7 +1,6 @@
 import 'filter_resultat.dart';
 import 'package:flutter/material.dart';
 import 'beregning_varmeforbrug.dart';
-import 'beregning_varmegenvinding_optimering.dart';
 
 class AnlaegsdataWidget extends StatelessWidget {
   final TextEditingController anlaegsNavnController;
@@ -34,7 +33,7 @@ class AnlaegsdataWidget extends StatelessWidget {
         const Text('Anlægstype',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         DropdownButtonFormField<String>(
-          value: valgtAnlaegstype,
+          initialValue: valgtAnlaegstype,
           items: const [
             DropdownMenuItem(
                 value: 'Ventilationsanlæg', child: Text('Ventilationsanlæg')),

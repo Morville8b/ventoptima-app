@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'generel_projekt_info.dart';
 import 'beregning_varmegenvinding_optimering.dart';
 
@@ -215,7 +214,7 @@ VarmeforbrugResultat beregnVarmeforbrugOgVirkningsgrad({
       maaltVirkningsgrad: samletVirkningsgrad,
       driftstype: driftstype,
       kommentar: "Anlægget har recirkulering ${recirkuleringProcent.toStringAsFixed(0)} % "
-          "${harKombineretGenvinding ? 'samt ${kombineretVarmegenvindingsType} med en målt virkningsgrad på ${beregnetKombineretEta.toStringAsFixed(0)} %. ' : ''}"
+          "${harKombineretGenvinding ? 'samt $kombineretVarmegenvindingsType med en målt virkningsgrad på ${beregnetKombineretEta.toStringAsFixed(0)} %. ' : ''}"
           "Den samlede varmegevinst svarer til en virkningsgrad på ${samletVirkningsgrad.toStringAsFixed(1)} %. "
           "$tempTekst$co2Advarsel",
       optimering: OptimeretVarmegenvindingResultat(
@@ -231,7 +230,7 @@ VarmeforbrugResultat beregnVarmeforbrugOgVirkningsgrad({
         co2Besparelse: besparelseKWh * co2Faktor,
         minGraense: 0,
         kommentar: "Anlægget har recirkulering ${recirkuleringProcent.toStringAsFixed(0)} % "
-            "${harKombineretGenvinding ? 'samt ${kombineretVarmegenvindingsType} med en målt virkningsgrad på ${beregnetKombineretEta.toStringAsFixed(0)} %. ' : ''}"
+            "${harKombineretGenvinding ? 'samt $kombineretVarmegenvindingsType med en målt virkningsgrad på ${beregnetKombineretEta.toStringAsFixed(0)} %. ' : ''}"
             "Den samlede varmegevinst svarer til en virkningsgrad på ${samletVirkningsgrad.toStringAsFixed(1)} %. "
             "$tempTekst$co2Advarsel",
       ),

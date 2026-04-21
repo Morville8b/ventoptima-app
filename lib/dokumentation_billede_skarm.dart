@@ -47,7 +47,7 @@ class DokumentationBilledeSkarm extends StatefulWidget {
   final VarmeforbrugResultat? varmeforbrugResultat;
 
   const DokumentationBilledeSkarm({
-    Key? key,
+    super.key,
     required this.index,
     required this.alleAnlaeg,
     required this.anlaegsNavn,
@@ -83,7 +83,7 @@ class DokumentationBilledeSkarm extends StatefulWidget {
     required this.omkostningEfter,
     required this.samletOmkostning,
     this.varmeforbrugResultat,
-  }) : super(key: key);
+  });
 
   @override
   _DokumentationBilledeSkarmState createState() =>
@@ -362,7 +362,7 @@ class _DokumentationBilledeSkarmState
                     ? const Center(child: Text('Ingen billeder tilføjet endnu'))
                     : ListView.separated(
                   itemCount: _elementer.length,
-                  separatorBuilder: (_, __) => const Divider(),
+                  separatorBuilder: (_, _) => const Divider(),
                   itemBuilder: (context, index) {
                     final element = _elementer[index];
                     return Card(
@@ -500,7 +500,6 @@ class _DokumentationsElement {
 
   _DokumentationsElement({
     required this.billede,
-    required this.beskrivelseController,
-    this.billedeHoejde = 300.0,  // 🆕 Standard størrelse
+    required this.beskrivelseController,  // 🆕 Standard størrelse
   });
 }

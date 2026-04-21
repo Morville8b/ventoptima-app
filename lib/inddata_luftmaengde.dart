@@ -150,7 +150,7 @@ class LuftmaengdeVisning extends StatelessWidget {
           title: const Text('Beregning med K-værdi'),
           value: visKVaerdiBeregning,
           onChanged: (_) => onSkiftKVaerdi(),
-          activeColor: Color(0xFF34E0A1),
+          activeThumbColor: Color(0xFF34E0A1),
           inactiveTrackColor: Color(0xFF34E0A1),
         ),
         if (visKVaerdiBeregning) ...[
@@ -181,7 +181,7 @@ class LuftmaengdeVisning extends StatelessWidget {
           title: const Text('Beregning ud fra designdata'),
           value: visEffektBeregning,
           onChanged: (_) => onSkiftEffekt(),
-          activeColor: Color(0xFF34E0A1),
+          activeThumbColor: Color(0xFF34E0A1),
           inactiveTrackColor: Color(0xFF34E0A1),
         ),
         if (visEffektBeregning) ...[

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:url_launcher/url_launcher.dart';
 import 'package:ventoptima/generel_projekt_info.dart';
 import 'package:ventoptima/anlaegs_data.dart';
 import 'package:ventoptima/ventilator_samlet_beregning.dart';
@@ -19,13 +18,13 @@ class RapportForsideSkarm extends StatefulWidget {
   final double varmePris;
 
   const RapportForsideSkarm({
-    Key? key,
+    super.key,
     required this.projektInfo,
     required this.alleAnlaeg,
     required this.alleForslag,
     required this.elPris,
     required this.varmePris,
-  }) : super(key: key);
+  });
 
   @override
   State<RapportForsideSkarm> createState() => _RapportForsideSkarmState();

@@ -6,7 +6,6 @@ import 'anlaegs_data.dart';
 import 'ventilator_samlet_beregning.dart';
 import 'package:ventoptima/services/app_sikkerhed.dart';
 import 'generel_projekt_info.dart' as gpi;
-import 'maaledata_skarm.dart' as mds;
 
 class GenerelInfoSkarm extends StatefulWidget {
   const GenerelInfoSkarm({super.key});
@@ -274,7 +273,7 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
             _sektionTitel('Afdeling'),
             DropdownButtonFormField<String>(
               key: _afdelingKey,
-              value: _valgtAfdeling,
+              initialValue: _valgtAfdeling,
               decoration: const InputDecoration(labelText: 'Vælg afdeling'),
               items: _afdelinger.map((afdeling) {
                 return DropdownMenuItem(value: afdeling, child: Text(afdeling));
@@ -294,7 +293,7 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
             const SizedBox(height: 24),
             _sektionTitel('Energipriser'),
             DropdownButtonFormField<String>(
-              value: _valgtKundeType,
+              initialValue: _valgtKundeType,
               decoration: const InputDecoration(labelText: 'Kundetype'),
               items: _kundeTyper.map((type) =>
                   DropdownMenuItem(value: type, child: Text(type))).toList(),
@@ -306,7 +305,7 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
               },
             ),
             DropdownButtonFormField<String>(
-              value: _valgtEnergiType,
+              initialValue: _valgtEnergiType,
               decoration: const InputDecoration(labelText: 'Varmeleverandør'),
               items: _energiTyper.map((type) =>
                   DropdownMenuItem(value: type, child: Text(type))).toList(),
@@ -351,7 +350,7 @@ class _GenerelInfoSkarmState extends State<GenerelInfoSkarm> {
             const SizedBox(height: 24),
             _sektionTitel('Tidsrum for drift'),
             DropdownButtonFormField<String>(
-              value: _valgtDriftperiode,
+              initialValue: _valgtDriftperiode,
               decoration: const InputDecoration(labelText: 'Driftperiode'),
               items: _driftperioder.map((periode) => DropdownMenuItem(
                 value: periode,

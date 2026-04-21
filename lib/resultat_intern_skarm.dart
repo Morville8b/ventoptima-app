@@ -12,7 +12,6 @@ import 'ventilator_samlet_beregning.dart';
 import 'ventilator_oekonomi_kort.dart';
 import 'package:ventoptima/beregning_varmeforbrug.dart';
 import 'beregning_varmegenvinding_optimering.dart';
-import 'filter_resultat.dart';
 import 'filter_resultat_skarm.dart';
 import 'filter_skarm.dart';
 import 'dart:math';
@@ -711,8 +710,8 @@ class ResultatInternSkarm extends StatelessWidget {
     final bool erLuftmaengdeMaaeltIndtastetInd = this.erLuftmaengdeMaaeltIndtastetInd;
     final bool erLuftmaengdeMaaeltIndtastetUd = this.erLuftmaengdeMaaeltIndtastetUd;
 
-    final bool flagKVaerdiInd = this.erBeregnetUdFraKVaerdiInd;
-    final bool flagKVaerdiUd = this.erBeregnetUdFraKVaerdiUd;
+    final bool flagKVaerdiInd = erBeregnetUdFraKVaerdiInd;
+    final bool flagKVaerdiUd = erBeregnetUdFraKVaerdiUd;
 
     final bool erLavHzInd = hzInd < 50;
     final bool erLavHzUd = hzUd < 50;
@@ -855,8 +854,8 @@ class ResultatInternSkarm extends StatelessWidget {
                         const SizedBox(height: 12),
                         const Text('Ved maksimal drift:', style: TextStyle(fontWeight: FontWeight.w600, fontStyle: FontStyle.italic)),
                         Text('Luftmængde maks: ${formatNumber(luftIndMax!)} m³/h'),
-                        if (statiskTrykMaxInd != null && statiskTrykMaxInd! > 0)
-                          Text('Statisk tryk maks: ${formatNumber(statiskTrykMaxInd!)} Pa'),
+                        if (statiskTrykMaxInd != null && statiskTrykMaxInd > 0)
+                          Text('Statisk tryk maks: ${formatNumber(statiskTrykMaxInd)} Pa'),
                       ],
                       const SizedBox(height: 24),
                     ],
@@ -877,8 +876,8 @@ class ResultatInternSkarm extends StatelessWidget {
                         const SizedBox(height: 12),
                         const Text('Ved maksimal drift:', style: TextStyle(fontWeight: FontWeight.w600, fontStyle: FontStyle.italic)),
                         Text('Luftmængde maks: ${formatNumber(luftUdMax!)} m³/h'),
-                        if (statiskTrykMaxUd != null && statiskTrykMaxUd! > 0)
-                          Text('Statisk tryk maks: ${formatNumber(statiskTrykMaxUd!)} Pa'),
+                        if (statiskTrykMaxUd != null && statiskTrykMaxUd > 0)
+                          Text('Statisk tryk maks: ${formatNumber(statiskTrykMaxUd)} Pa'),
                       ],
                       const SizedBox(height: 24),
                     ],
@@ -893,9 +892,9 @@ class ResultatInternSkarm extends StatelessWidget {
                     const SizedBox(height: 12),
 
                     if (aktuelVarmeResultat != null &&
-                        ((anlaegsType == 'Ventilationsanlæg' && aktuelVarmeResultat!.harBeregning) ||
-                            (anlaegsType == 'Indblæsningsanlæg' && (aktuelVarmeResultat!.varmeforbrugKWh ?? 0) > 0) ||
-                            (anlaegsType == 'Udsugningsanlæg' && (aktuelVarmeResultat!.varmeforbrugKWh ?? 0) > 0))) ...[
+                        ((anlaegsType == 'Ventilationsanlæg' && aktuelVarmeResultat.harBeregning) ||
+                            (anlaegsType == 'Indblæsningsanlæg' && (aktuelVarmeResultat.varmeforbrugKWh ?? 0) > 0) ||
+                            (anlaegsType == 'Udsugningsanlæg' && (aktuelVarmeResultat.varmeforbrugKWh ?? 0) > 0))) ...[
                       const SizedBox(height: 16),
 
                       const Text(
@@ -905,28 +904,28 @@ class ResultatInternSkarm extends StatelessWidget {
                       const SizedBox(height: 12),
 
                       if (anlaegsType == 'Ventilationsanlæg') ...[
-                        if (aktuelVarmeResultat!.harBeregning) ...[
+                        if (aktuelVarmeResultat.harBeregning) ...[
                           const Text('Før optimering', style: TextStyle(fontWeight: FontWeight.bold)),
-                          Text('Årsforbrug: ${formatNumber(aktuelVarmeResultat!.varmeforbrugKWh)} kWh/år'),
-                          Text('Årlig omkostning: ${formatNumber(aktuelVarmeResultat!.varmeOmkostning)} kr./år'),
+                          Text('Årsforbrug: ${formatNumber(aktuelVarmeResultat.varmeforbrugKWh)} kWh/år'),
+                          Text('Årlig omkostning: ${formatNumber(aktuelVarmeResultat.varmeOmkostning)} kr./år'),
                           Text(
-                            aktuelVarmeResultat!.recirkuleringProcent != null
-                                ? 'Recirkulering: ${formatDecimal(aktuelVarmeResultat!.recirkuleringProcent!, 0)} %'
-                                : 'Målt virkningsgrad: ${formatDecimal(aktuelVarmeResultat!.maaltVirkningsgrad, 1)} %',
+                            aktuelVarmeResultat.recirkuleringProcent != null
+                                ? 'Recirkulering: ${formatDecimal(aktuelVarmeResultat.recirkuleringProcent!, 0)} %'
+                                : 'Målt virkningsgrad: ${formatDecimal(aktuelVarmeResultat.maaltVirkningsgrad, 1)} %',
                           ),
-                          if (aktuelVarmeResultat!.recirkuleringProcent != null)
+                          if (aktuelVarmeResultat.recirkuleringProcent != null)
                             Text(
-                              'Samlet virkningsgrad: ${formatDecimal(aktuelVarmeResultat!.maaltVirkningsgrad, 1)} %',
+                              'Samlet virkningsgrad: ${formatDecimal(aktuelVarmeResultat.maaltVirkningsgrad, 1)} %',
                             ),
                           Text(
-                            aktuelVarmeResultat!.recirkuleringProcent != null
-                                ? aktuelVarmeResultat!.varmegenvindingVirkningsgrad != null
-                                ? 'Temp. efter blanding + genvinding: ${formatDecimal(aktuelVarmeResultat!.gennemsnitTemp, 1)} °C'
-                                : 'Blandingstemperatur: ${formatDecimal(aktuelVarmeResultat!.gennemsnitTemp, 1)} °C'
-                                : 'Temp. efter varmegenvinding: ${formatDecimal(aktuelVarmeResultat!.gennemsnitTemp, 1)} °C',
+                            aktuelVarmeResultat.recirkuleringProcent != null
+                                ? aktuelVarmeResultat.varmegenvindingVirkningsgrad != null
+                                ? 'Temp. efter blanding + genvinding: ${formatDecimal(aktuelVarmeResultat.gennemsnitTemp, 1)} °C'
+                                : 'Blandingstemperatur: ${formatDecimal(aktuelVarmeResultat.gennemsnitTemp, 1)} °C'
+                                : 'Temp. efter varmegenvinding: ${formatDecimal(aktuelVarmeResultat.gennemsnitTemp, 1)} °C',
                           ),
 
-                          if (aktuelVarmeResultat!.recirkuleringProcent != null) ...[
+                          if (aktuelVarmeResultat.recirkuleringProcent != null) ...[
                             const SizedBox(height: 12),
                             Container(
                               padding: const EdgeInsets.all(12),
@@ -952,12 +951,12 @@ class ResultatInternSkarm extends StatelessWidget {
                                 ],
                               ),
                             ),
-                          ] else if (aktuelVarmeResultat!.optimering?.kanOptimeres ?? false) ...[
+                          ] else if (aktuelVarmeResultat.optimering?.kanOptimeres ?? false) ...[
                             const SizedBox(height: 12),
                             const Text('Efter optimering', style: TextStyle(fontWeight: FontWeight.bold)),
-                            Text('Nyt varmeforbrug: ${formatNumber(aktuelVarmeResultat!.optimering!.nytVarmeforbrugKWh ?? 0)} kWh/år'),
-                            Text('Ny omkostning: ${formatNumber(aktuelVarmeResultat!.optimering!.nytVarmeforbrugKr ?? 0)} kr./år'),
-                            Text('Ny virkningsgrad: ${formatDecimal(aktuelVarmeResultat!.optimering!.nyVirkningsgrad, 1)} %'),
+                            Text('Nyt varmeforbrug: ${formatNumber(aktuelVarmeResultat.optimering!.nytVarmeforbrugKWh ?? 0)} kWh/år'),
+                            Text('Ny omkostning: ${formatNumber(aktuelVarmeResultat.optimering!.nytVarmeforbrugKr ?? 0)} kr./år'),
+                            Text('Ny virkningsgrad: ${formatDecimal(aktuelVarmeResultat.optimering!.nyVirkningsgrad, 1)} %'),
                           ],
                         ],
 
@@ -967,23 +966,23 @@ class ResultatInternSkarm extends StatelessWidget {
                           builder: (context) {
                             String kommentar;
 
-                            if (!aktuelVarmeResultat!.harBeregning) {
+                            if (!aktuelVarmeResultat.harBeregning) {
                               kommentar = "👉 Det har ikke været muligt at fastsætte varmeforbruget under service. "
                                   "En mulig årsag kan være, at udetemperaturen var over 10 °C under service.";
-                            } else if (aktuelVarmeResultat!.optimering != null &&
-                                !(aktuelVarmeResultat!.optimering!.kanOptimeres)) {
+                            } else if (aktuelVarmeResultat.optimering != null &&
+                                !(aktuelVarmeResultat.optimering!.kanOptimeres)) {
                               kommentar = "👉 Anlæggets varmegenvinding er allerede tæt på det forventede niveau "
                                   "og vurderes ikke at kunne optimeres yderligere.";
-                            } else if (aktuelVarmeResultat!.optimering?.kommentar != null &&
-                                aktuelVarmeResultat!.optimering!.kommentar.contains("Virkningsgrad oplyst af producenten")) {
-                              kommentar = "👉 ${aktuelVarmeResultat!.optimering!.kommentar}";
-                            } else if (aktuelVarmeResultat!.optimering?.korrigeretVirkningsgrad != null) {
-                              kommentar = "👉 ${aktuelVarmeResultat!.optimering!.kommentar}";
-                            } else if (aktuelVarmeResultat!.recirkuleringProcent != null) {
-                            kommentar = aktuelVarmeResultat!.kommentar ?? '';
+                            } else if (aktuelVarmeResultat.optimering?.kommentar != null &&
+                                aktuelVarmeResultat.optimering!.kommentar.contains("Virkningsgrad oplyst af producenten")) {
+                              kommentar = "👉 ${aktuelVarmeResultat.optimering!.kommentar}";
+                            } else if (aktuelVarmeResultat.optimering?.korrigeretVirkningsgrad != null) {
+                              kommentar = "👉 ${aktuelVarmeResultat.optimering!.kommentar}";
+                            } else if (aktuelVarmeResultat.recirkuleringProcent != null) {
+                            kommentar = aktuelVarmeResultat.kommentar ?? '';
                             } else {
                             kommentar = "👉 Standard virkningsgrad anvendt: "
-                            "${formatDK(aktuelVarmeResultat!.optimering?.valgtVirkningsgrad ?? 0, decimals: 1)} %";
+                            "${formatDK(aktuelVarmeResultat.optimering?.valgtVirkningsgrad ?? 0, decimals: 1)} %";
                             }
 
                             return Text(
@@ -995,35 +994,35 @@ class ResultatInternSkarm extends StatelessWidget {
                       ],
 
                       if (anlaegsType == 'Indblæsningsanlæg') ...[
-                        if ((aktuelVarmeResultat?.varmeforbrugKWh ?? 0) > 0) ...[
-                          Text('Årsforbrug: ${formatNumber(aktuelVarmeResultat!.varmeforbrugKWh)} kWh/år'),
-                          Text('Årlig omkostning: ${formatNumber(aktuelVarmeResultat!.varmeOmkostning)} kr./år'),
-                          if (aktuelVarmeResultat!.co2Udledning > 0)
-                            Text('CO₂-udledning: ${formatDecimal(aktuelVarmeResultat!.co2Udledning, 1)} ton/år'),
+                        if ((aktuelVarmeResultat.varmeforbrugKWh ?? 0) > 0) ...[
+                          Text('Årsforbrug: ${formatNumber(aktuelVarmeResultat.varmeforbrugKWh)} kWh/år'),
+                          Text('Årlig omkostning: ${formatNumber(aktuelVarmeResultat.varmeOmkostning)} kr./år'),
+                          if (aktuelVarmeResultat.co2Udledning > 0)
+                            Text('CO₂-udledning: ${formatDecimal(aktuelVarmeResultat.co2Udledning, 1)} ton/år'),
                         ],
-                        if (aktuelVarmeResultat!.kommentar != null &&
-                            aktuelVarmeResultat!.kommentar!.isNotEmpty) ...[
+                        if (aktuelVarmeResultat.kommentar != null &&
+                            aktuelVarmeResultat.kommentar!.isNotEmpty) ...[
                           const SizedBox(height: 8),
                           Text(
-                            aktuelVarmeResultat!.kommentar!,
+                            aktuelVarmeResultat.kommentar!,
                             style: const TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
                           ),
                         ],
                       ],
 
                       if (anlaegsType == 'Udsugningsanlæg') ...[
-                        if ((aktuelVarmeResultat?.varmeforbrugKWh ?? 0) > 0) ...[
-                          Text('Årligt tab: ${formatNumber(aktuelVarmeResultat!.varmeforbrugKWh)} kWh/år'),
-                          Text('Årlig omkostning: ${formatNumber(aktuelVarmeResultat!.varmeOmkostning)} kr./år'),
-                          if (aktuelVarmeResultat!.co2Udledning > 0)
-                            Text('CO₂-udledning: ${formatDecimal(aktuelVarmeResultat!.co2Udledning, 1)} ton/år'),
+                        if ((aktuelVarmeResultat.varmeforbrugKWh ?? 0) > 0) ...[
+                          Text('Årligt tab: ${formatNumber(aktuelVarmeResultat.varmeforbrugKWh)} kWh/år'),
+                          Text('Årlig omkostning: ${formatNumber(aktuelVarmeResultat.varmeOmkostning)} kr./år'),
+                          if (aktuelVarmeResultat.co2Udledning > 0)
+                            Text('CO₂-udledning: ${formatDecimal(aktuelVarmeResultat.co2Udledning, 1)} ton/år'),
                         ],
 
-                        if (aktuelVarmeResultat!.kommentar != null &&
-                            aktuelVarmeResultat!.kommentar!.isNotEmpty) ...[
+                        if (aktuelVarmeResultat.kommentar != null &&
+                            aktuelVarmeResultat.kommentar!.isNotEmpty) ...[
                           const SizedBox(height: 8),
                           Text(
-                            aktuelVarmeResultat!.kommentar!,
+                            aktuelVarmeResultat.kommentar!,
                             style: const TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
                           ),
                         ],
@@ -1612,8 +1611,8 @@ class ResultatInternSkarm extends StatelessWidget {
                                   driftstimer: driftstimer,
                                   virkningsgradInd: virkningsgradInd,
                                   virkningsgradUd: virkningsgradUd,
-                                  erBeregnetUdFraKVaerdiInd: this.erBeregnetUdFraKVaerdiInd,
-                                  erBeregnetUdFraKVaerdiUd: this.erBeregnetUdFraKVaerdiUd,
+                                  erBeregnetUdFraKVaerdiInd: erBeregnetUdFraKVaerdiInd,
+                                  erBeregnetUdFraKVaerdiUd: erBeregnetUdFraKVaerdiUd,
                                   erLuftmaengdeMaaeltIndtastetInd: this.erLuftmaengdeMaaeltIndtastetInd,
                                   erLuftmaengdeMaaeltIndtastetUd: this.erLuftmaengdeMaaeltIndtastetUd,
                                   internKommentar: internKommentar,
@@ -1872,8 +1871,8 @@ class ResultatInternSkarm extends StatelessWidget {
                                 driftstimer: driftstimer,
                                 virkningsgradInd: virkningsgradInd,
                                 virkningsgradUd: virkningsgradUd,
-                                erBeregnetUdFraKVaerdiInd: this.erBeregnetUdFraKVaerdiInd,
-                                erBeregnetUdFraKVaerdiUd: this.erBeregnetUdFraKVaerdiUd,
+                                erBeregnetUdFraKVaerdiInd: erBeregnetUdFraKVaerdiInd,
+                                erBeregnetUdFraKVaerdiUd: erBeregnetUdFraKVaerdiUd,
                                 erLuftmaengdeMaaeltIndtastetInd: this.erLuftmaengdeMaaeltIndtastetInd,
                                 erLuftmaengdeMaaeltIndtastetUd: this.erLuftmaengdeMaaeltIndtastetUd,
                                 internKommentar: internKommentar,

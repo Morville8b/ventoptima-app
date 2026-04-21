@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 Future<KammerData?> visKammerOpmalingPopup(BuildContext context) async {
-  const Color _matchingGreen = Color(0xFF34E0A1);
-  const Color _matchingBlue = Color(0xFF006390);
+  const Color matchingGreen = Color(0xFF34E0A1);
+  const Color matchingBlue = Color(0xFF006390);
 
   final TextEditingController breddeController = TextEditingController();
   final TextEditingController hoejdeController = TextEditingController();
@@ -47,13 +47,13 @@ Future<KammerData?> visKammerOpmalingPopup(BuildContext context) async {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: _matchingGreen.withOpacity(0.1),
+                        color: matchingGreen.withOpacity(0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.straighten,
                         size: 40,
-                        color: _matchingBlue,
+                        color: matchingBlue,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -64,7 +64,7 @@ Future<KammerData?> visKammerOpmalingPopup(BuildContext context) async {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: _matchingBlue,
+                        color: matchingBlue,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -100,7 +100,7 @@ Future<KammerData?> visKammerOpmalingPopup(BuildContext context) async {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        prefixIcon: const Icon(Icons.width_full, color: _matchingGreen),
+                        prefixIcon: const Icon(Icons.width_full, color: matchingGreen),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -115,7 +115,7 @@ Future<KammerData?> visKammerOpmalingPopup(BuildContext context) async {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        prefixIcon: const Icon(Icons.height, color: _matchingGreen),
+                        prefixIcon: const Icon(Icons.height, color: matchingGreen),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -130,7 +130,7 @@ Future<KammerData?> visKammerOpmalingPopup(BuildContext context) async {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        prefixIcon: const Icon(Icons.straighten, color: _matchingGreen),
+                        prefixIcon: const Icon(Icons.straighten, color: matchingGreen),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -143,7 +143,7 @@ Future<KammerData?> visKammerOpmalingPopup(BuildContext context) async {
                             onPressed: () => Navigator.pop(context, null),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 16),
-                              side: const BorderSide(color: _matchingGreen, width: 2),
+                              side: const BorderSide(color: matchingGreen, width: 2),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -151,7 +151,7 @@ Future<KammerData?> visKammerOpmalingPopup(BuildContext context) async {
                             child: const Text(
                               'Annuller',
                               style: TextStyle(
-                                color: _matchingBlue,
+                                color: matchingBlue,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -175,7 +175,7 @@ Future<KammerData?> visKammerOpmalingPopup(BuildContext context) async {
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: _matchingGreen,
+                              backgroundColor: matchingGreen,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -185,7 +185,7 @@ Future<KammerData?> visKammerOpmalingPopup(BuildContext context) async {
                             child: const Text(
                               'Gem',
                               style: TextStyle(
-                                color: _matchingBlue,
+                                color: matchingBlue,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'ventilator_samlet_beregning.dart';
-import 'package:intl/intl.dart';
 
 class VentilatorKortData {
   final VentilatorOekonomiSamlet resultat;
@@ -33,7 +32,7 @@ class VentilatorOekonomiKort extends StatelessWidget {
   final String anlaegsType;
 
   const VentilatorOekonomiKort({
-    Key? key,
+    super.key,
     required this.resultat,
     required this.logoAsset,
     required this.producentNavn,
@@ -46,7 +45,7 @@ class VentilatorOekonomiKort extends StatelessWidget {
     required this.samletAarsforbrugKWh,
     required this.samletOmkostning,
     required this.anlaegsType,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +124,7 @@ class VentilatorOekonomiKort extends StatelessWidget {
             if (kontakttekst != null) ...[
               const SizedBox(height: 12),
               Text(
-                kontakttekst!,
+                kontakttekst,
                 style: const TextStyle(
                     color: Colors.red, fontWeight: FontWeight.bold),
               ),

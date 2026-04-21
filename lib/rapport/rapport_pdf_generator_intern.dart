@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:intl/intl.dart';
@@ -414,12 +413,11 @@ Future<Uint8List> generateInternPdfKort({
                   pw.SizedBox(height: 10),
                   if (beregnetDesignInd || beregnetDesignUd) ...[
                     pw.Text(
-                      'Luftmængde beregnet ud fra designdata' +
-                          ((beregnetDesignInd && beregnetDesignUd)
+                      'Luftmængde beregnet ud fra designdata${(beregnetDesignInd && beregnetDesignUd)
                               ? ''
                               : beregnetDesignUd
                               ? ' (kun udsugning)'
-                              : ' (kun indblæsning)'),
+                              : ' (kun indblæsning)'}',
                       style: pw.TextStyle(fontSize: bodyFontSize, color: PdfColors.red),
                     ),
                   ],
@@ -431,12 +429,11 @@ Future<Uint8List> generateInternPdfKort({
                   ],
                   if (beregnetKVaerdiInd || beregnetKVaerdiUd) ...[
                     pw.Text(
-                      'Luftmængden er beregnet ud fra K-værdi' +
-                          ((beregnetKVaerdiInd && beregnetKVaerdiUd)
+                      'Luftmængden er beregnet ud fra K-værdi${(beregnetKVaerdiInd && beregnetKVaerdiUd)
                               ? ' (indblæsning og udsugning)'
                               : beregnetKVaerdiUd
                               ? ' (kun udsugning)'
-                              : ' (kun indblæsning)'),
+                              : ' (kun indblæsning)'}',
                       style: pw.TextStyle(fontSize: bodyFontSize, color: PdfColors.red),
                     ),
                   ],
@@ -740,8 +737,8 @@ Future<Uint8List> generateInternPdfKort({
                           varmeforbrugResultat.harBeregning &&
                           varmeforbrugResultat.optimering != null;
                       final double varmeBesparelseKr = (erNytVentilationsanlaeg && harVarmeberegning)
-                          ? ((varmeforbrugResultat?.varmeOmkostning?.toDouble() ?? 0) -
-                          (varmeforbrugResultat?.optimering?.nytVarmeforbrugKr?.toDouble() ?? 0))
+                          ? ((varmeforbrugResultat.varmeOmkostning.toDouble() ?? 0) -
+                          (varmeforbrugResultat.optimering?.nytVarmeforbrugKr?.toDouble() ?? 0))
                           : 0;
                       final double samletBesparelseKr = eco.aarsbesparelse + varmeBesparelseKr;
                       final double korrektTilbagebetalingstid = samletBesparelseKr > 0
@@ -1193,9 +1190,9 @@ Future<Uint8List> generateInternPdfKort({
               ),
               pw.SizedBox(height: sectionSpacing),
             ],
-            _buildDataRow('Højde:', '${kammerHoede!.toStringAsFixed(0)} mm', bodyFontSize),
-            _buildDataRow('Længde:', '${kammerLaengde!.toStringAsFixed(0)} mm', bodyFontSize),
-            _buildDataRow('Bredde:', '${kammerBredde!.toStringAsFixed(0)} mm', bodyFontSize),
+            _buildDataRow('Højde:', '${kammerHoede.toStringAsFixed(0)} mm', bodyFontSize),
+            _buildDataRow('Længde:', '${kammerLaengde.toStringAsFixed(0)} mm', bodyFontSize),
+            _buildDataRow('Bredde:', '${kammerBredde.toStringAsFixed(0)} mm', bodyFontSize),
           ],
         ),
       ),

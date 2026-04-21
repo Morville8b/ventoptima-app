@@ -557,12 +557,12 @@ class RapportBesparelsesforslag {
     final bool harVarmeOptimering = varmeforbrugResultat?.optimering?.kanOptimeres ?? false;
 
     final double varmeBesparelseKWh = (erNytVentilationsanlaeg && harVarmeOptimering)
-        ? ((varmeforbrugResultat?.varmeforbrugKWh?.toDouble() ?? 0) -
+        ? ((varmeforbrugResultat?.varmeforbrugKWh.toDouble() ?? 0) -
         (varmeforbrugResultat?.optimering?.nytVarmeforbrugKWh?.toDouble() ?? 0))
         : 0;
 
     final double varmeBesparelseKr = (erNytVentilationsanlaeg && harVarmeOptimering)
-        ? ((varmeforbrugResultat?.varmeOmkostning?.toDouble() ?? 0) -
+        ? ((varmeforbrugResultat?.varmeOmkostning.toDouble() ?? 0) -
         (varmeforbrugResultat?.optimering?.nytVarmeforbrugKr?.toDouble() ?? 0))
         : 0;
 
@@ -847,9 +847,9 @@ class RapportBesparelsesforslag {
         varme.harBeregning &&
         (varme.optimering?.kanOptimeres ?? false);
 
-    final double nuvEnergiKWh = harVarmeData ? (varme.varmeforbrugKWh?.toDouble() ?? 0) : 0;
+    final double nuvEnergiKWh = harVarmeData ? (varme.varmeforbrugKWh.toDouble() ?? 0) : 0;
     final double efterEnergiKWh = harVarmeData ? (varme.optimering?.nytVarmeforbrugKWh?.toDouble() ?? 0) : 0;
-    final double nuvEnergiKr = harVarmeData ? (varme.varmeOmkostning?.toDouble() ?? 0) : 0;
+    final double nuvEnergiKr = harVarmeData ? (varme.varmeOmkostning.toDouble() ?? 0) : 0;
     final double efterEnergiKr = harVarmeData ? (varme.optimering?.nytVarmeforbrugKr?.toDouble() ?? 0) : 0;
 
     final double varmeBesparelseKWh = harVarmeData ? (nuvEnergiKWh - efterEnergiKWh) : 0;

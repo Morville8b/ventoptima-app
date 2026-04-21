@@ -3,11 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:ventoptima/ventilator_samlet_beregning.dart';
 import 'package:ventoptima/besparelseforslag_skarm.dart';
 import 'package:ventoptima/generel_projekt_info.dart';
-import 'package:ventoptima/beregning_varmegenvinding_optimering.dart';
 import 'package:ventoptima/anlaegs_data.dart';
 import 'rapport_page_view.dart';
-import 'filter_resultat.dart';
-import 'rapport/rapport_forside_skarm.dart';
 import 'rapport/rapport_preview.dart';
 import 'package:ventoptima/maaledata_skarm.dart';
 
@@ -29,12 +26,12 @@ class AnlaegsOversigtSkarm extends StatelessWidget {
   final GenerelProjektInfo projektInfo;
 
   const AnlaegsOversigtSkarm({
-    Key? key,
+    super.key,
     required this.alleForslag,
     required this.elPris,
     required this.varmePris,
     required this.projektInfo,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -5,9 +5,9 @@ class BravidaLoadingIndicator extends StatefulWidget {
   final ValueNotifier<String> messageNotifier;
 
   const BravidaLoadingIndicator({
-    Key? key,
+    super.key,
     required this.messageNotifier,
-  }) : super(key: key);
+  });
 
   @override
   State<BravidaLoadingIndicator> createState() =>

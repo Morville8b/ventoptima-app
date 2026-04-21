@@ -142,68 +142,68 @@ FilterResultat beregnFilterResultat({
   debugPrint("luftPerFilterUdFoer (N44): $luftPerFilterUdFoer");
 
   // TRIN 2: Beregn energiforbrug per filter FØR (BeregnEnergiForbrugIndblæsningFør)
-  final double N38_forbrugFoerInd = beregnEnergiForbrug(filterFoerInd, luftPerFilterIndFoer); // N38 i VBA
-  final double N45_forbrugFoerUd = beregnEnergiForbrug(filterFoerUd, luftPerFilterUdFoer);    // N45 i VBA
+  final double n38Forbrugfoerind = beregnEnergiForbrug(filterFoerInd, luftPerFilterIndFoer); // N38 i VBA
+  final double n45Forbrugfoerud = beregnEnergiForbrug(filterFoerUd, luftPerFilterUdFoer);    // N45 i VBA
 
   debugPrint("TRIN 2 - Energiforbrug per filter FØR:");
-  debugPrint("N38_forbrugFoerInd: $N38_forbrugFoerInd");
-  debugPrint("N45_forbrugFoerUd: $N45_forbrugFoerUd");
+  debugPrint("N38_forbrugFoerInd: $n38Forbrugfoerind");
+  debugPrint("N45_forbrugFoerUd: $n45Forbrugfoerud");
 
   // TRIN 3: Beregn energiforbrug per filter EFTER - FASTE FILTRE
   final String anbefaletFilterInd = "Hiflo XLT F7 592 x 592 x 520";  // FAST ANBEFALING
   final String anbefaletFilterUd = "Hiflo XLT F7 592 x 592 x 520";   // FAST ANBEFALING
 
-  final double O38_forbrugEfterInd = beregnEnergiForbrug(anbefaletFilterInd, luftPerFilterIndFoer); // O38 i VBA
-  final double O45_forbrugEfterUd = beregnEnergiForbrug(anbefaletFilterUd, luftPerFilterUdFoer);    // O45 i VBA
+  final double o38Forbrugefterind = beregnEnergiForbrug(anbefaletFilterInd, luftPerFilterIndFoer); // O38 i VBA
+  final double o45Forbrugefterud = beregnEnergiForbrug(anbefaletFilterUd, luftPerFilterUdFoer);    // O45 i VBA
 
   debugPrint("TRIN 3 - Energiforbrug per filter EFTER:");
   debugPrint("anbefaletFilterInd: $anbefaletFilterInd");
-  debugPrint("O38_forbrugEfterInd: $O38_forbrugEfterInd");
+  debugPrint("O38_forbrugEfterInd: $o38Forbrugefterind");
   debugPrint("anbefaletFilterUd: $anbefaletFilterUd");
-  debugPrint("O45_forbrugEfterUd: $O45_forbrugEfterUd");
+  debugPrint("O45_forbrugEfterUd: $o45Forbrugefterud");
 
   // TRIN 4: Beregn total kWh FØR (BeregnEnergiForbrugVidereIndblæsningFør)
   // VBA: resultat = (H20 / 3600) * N38 * e41 / ((F29 / 100) * 1000)
-  final double K38_energiFoerInd = (luftIndVal / 3600) * N38_forbrugFoerInd * driftVal / ((virknInd / 100) * 1000); // K38 i VBA
-  final double K44_energiFoerUd = (luftUdVal / 3600) * N45_forbrugFoerUd * driftVal / ((virknUd / 100) * 1000);    // K44 i VBA
+  final double k38Energifoerind = (luftIndVal / 3600) * n38Forbrugfoerind * driftVal / ((virknInd / 100) * 1000); // K38 i VBA
+  final double k44Energifoerud = (luftUdVal / 3600) * n45Forbrugfoerud * driftVal / ((virknUd / 100) * 1000);    // K44 i VBA
 
   // TRIN 5: Beregn total kWh EFTER (BeregnEnergiForbrugVidereIndblæsningEfter)
   // VBA: resultat = (H20 / 3600) * O38 * e41 / ((F29 / 100) * 1000)
-  final double K39_energiEfterInd = (luftIndVal / 3600) * O38_forbrugEfterInd * driftVal / ((virknInd / 100) * 1000); // K39 i VBA
-  final double K45_energiEfterUd = (luftUdVal / 3600) * O45_forbrugEfterUd * driftVal / ((virknUd / 100) * 1000);    // K45 i VBA
+  final double k39Energiefterind = (luftIndVal / 3600) * o38Forbrugefterind * driftVal / ((virknInd / 100) * 1000); // K39 i VBA
+  final double k45Energiefterud = (luftUdVal / 3600) * o45Forbrugefterud * driftVal / ((virknUd / 100) * 1000);    // K45 i VBA
 
   debugPrint("TRIN 4+5 - Total kWh:");
-  debugPrint("K38_energiFoerInd: $K38_energiFoerInd");
-  debugPrint("K39_energiEfterInd: $K39_energiEfterInd");
-  debugPrint("K44_energiFoerUd: $K44_energiFoerUd");
-  debugPrint("K45_energiEfterUd: $K45_energiEfterUd");
+  debugPrint("K38_energiFoerInd: $k38Energifoerind");
+  debugPrint("K39_energiEfterInd: $k39Energiefterind");
+  debugPrint("K44_energiFoerUd: $k44Energifoerud");
+  debugPrint("K45_energiEfterUd: $k45Energiefterud");
 
   // SPECIFIKT DEBUG FOR INDBLÆSNING
   debugPrint("INDBLÆSNING DEBUG:");
   debugPrint("luftIndVal: $luftIndVal");
-  debugPrint("N38_forbrugFoerInd: $N38_forbrugFoerInd");
+  debugPrint("N38_forbrugFoerInd: $n38Forbrugfoerind");
   debugPrint("driftVal: $driftVal");
   debugPrint("virknInd: $virknInd");
-  debugPrint("Beregning: ($luftIndVal / 3600) * $N38_forbrugFoerInd * $driftVal / (($virknInd / 100) * 1000)");
-  debugPrint("= ${(luftIndVal / 3600) * N38_forbrugFoerInd * driftVal / ((virknInd / 100) * 1000)}");
+  debugPrint("Beregning: ($luftIndVal / 3600) * $n38Forbrugfoerind * $driftVal / (($virknInd / 100) * 1000)");
+  debugPrint("= ${(luftIndVal / 3600) * n38Forbrugfoerind * driftVal / ((virknInd / 100) * 1000)}");
 
   // TRIN 6: Beregn besparelser (K40 = K38 - K39, K46 = K44 - K45)
-  final double K40_besparelseInd = K38_energiFoerInd - K39_energiEfterInd; // K40 i VBA
-  final double K46_besparelseUd = K44_energiFoerUd - K45_energiEfterUd;    // K46 i VBA
-  final double samletBesparelseKWh = K40_besparelseInd + K46_besparelseUd;
+  final double k40Besparelseind = k38Energifoerind - k39Energiefterind; // K40 i VBA
+  final double k46Besparelseud = k44Energifoerud - k45Energiefterud;    // K46 i VBA
+  final double samletBesparelseKWh = k40Besparelseind + k46Besparelseud;
   final double samletBesparelseKr = samletBesparelseKWh * elPris;
 
   debugPrint("TRIN 6 - Besparelser:");
-  debugPrint("K40_besparelseInd: $K40_besparelseInd");
-  debugPrint("K46_besparelseUd: $K46_besparelseUd");
+  debugPrint("K40_besparelseInd: $k40Besparelseind");
+  debugPrint("K46_besparelseUd: $k46Besparelseud");
   debugPrint("samletBesparelseKWh: $samletBesparelseKWh");
   debugPrint("samletBesparelseKr: $samletBesparelseKr");
 
   return FilterResultat(
-    energiFoerInd: K38_energiFoerInd,
-    energiEfterInd: K39_energiEfterInd,
-    energiFoerUd: K44_energiFoerUd,
-    energiEfterUd: K45_energiEfterUd,
+    energiFoerInd: k38Energifoerind,
+    energiEfterInd: k39Energiefterind,
+    energiFoerUd: k44Energifoerud,
+    energiEfterUd: k45Energiefterud,
     samletBesparelseKWh: samletBesparelseKWh,
     samletBesparelseKr: samletBesparelseKr,
     trykGamleFiltreInd: trykGamleFiltreInd,

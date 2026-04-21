@@ -28,6 +28,7 @@ class ZiehlAbeggResultat implements BaseOekonomiResultat {
   final double samletOmkostning;
   final double aarsbesparelse;
 
+  @override
   final String varenummer;
   final String kommentar;
 

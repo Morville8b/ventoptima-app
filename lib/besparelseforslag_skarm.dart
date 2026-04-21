@@ -6,7 +6,6 @@ import 'beregning_varmeforbrug.dart';
 import 'anlaegs_data.dart';
 import 'dart:io';
 import 'filter_resultat.dart';
-import 'filter_resultat_skarm.dart';
 
 
 String formatDK(num value, {int decimals = 0}) {
@@ -70,7 +69,7 @@ class BesparelseForslagSkarm extends StatelessWidget {
 
 
   const BesparelseForslagSkarm({
-    Key? key,
+    super.key,
     required this.alleForslag,
     required this.elPris,
     required this.varmePris,
@@ -100,7 +99,7 @@ class BesparelseForslagSkarm extends StatelessWidget {
     this.samletFoerKr = 0,
     required this.valgtTilstand,
     this.filterResultat,
-  }) : super(key: key);
+  });
 
   // 🔹 Tilføj denne helper
   String formatNumber(num value) {
@@ -717,12 +716,12 @@ Widget _forslagKolonne({
   final bool harVarmeOptimering = varmeforbrugResultat?.optimering?.kanOptimeres ?? false;
 
   final double varmeBesparelseKWh = (erVentilationsanlaeg && harVarmeOptimering)
-      ? ((varmeforbrugResultat?.varmeforbrugKWh?.toDouble() ?? 0) -
+      ? ((varmeforbrugResultat?.varmeforbrugKWh.toDouble() ?? 0) -
       (varmeforbrugResultat?.optimering?.nytVarmeforbrugKWh?.toDouble() ?? 0))
       : 0;
 
   final double varmeBesparelseKr = (erVentilationsanlaeg && harVarmeOptimering)
-      ? ((varmeforbrugResultat?.varmeOmkostning?.toDouble() ?? 0) -
+      ? ((varmeforbrugResultat?.varmeOmkostning.toDouble() ?? 0) -
       (varmeforbrugResultat?.optimering?.nytVarmeforbrugKr?.toDouble() ?? 0))
       : 0;
 
@@ -1046,13 +1045,13 @@ Widget _samletResultatKort(
   // ✅ KRITISK FIX: Tjek om varmen kan optimeres før beregning
   final bool kanOptimeresVarme = varme?.optimering?.kanOptimeres ?? false;
 
-  final double nuvEnergiKWh = varme?.varmeforbrugKWh?.toDouble() ?? 0;
+  final double nuvEnergiKWh = varme?.varmeforbrugKWh.toDouble() ?? 0;
   // ✅ Hvis varmen ikke kan optimeres, sæt efter-værdi til samme som før-værdi (besparelse = 0)
   final double efterEnergiKWh = kanOptimeresVarme
       ? (varme?.optimering?.nytVarmeforbrugKWh?.toDouble() ?? nuvEnergiKWh)
       : nuvEnergiKWh;
 
-  final double nuvEnergiKr = varme?.varmeOmkostning?.toDouble() ?? 0;
+  final double nuvEnergiKr = varme?.varmeOmkostning.toDouble() ?? 0;
   // ✅ Hvis varmen ikke kan optimeres, sæt efter-værdi til samme som før-værdi (besparelse = 0)
   final double efterEnergiKr = kanOptimeresVarme
       ? (varme?.optimering?.nytVarmeforbrugKr?.toDouble() ?? nuvEnergiKr)

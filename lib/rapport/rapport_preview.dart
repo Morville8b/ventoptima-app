@@ -1,9 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'rapport_pdf_generator.dart';
 import 'package:ventoptima/rapport/rapport_pdf_generator_intern.dart';
@@ -24,13 +21,13 @@ class RapportPreview extends StatefulWidget {
   final double varmePris;
 
   const RapportPreview({
-    Key? key,
+    super.key,
     required this.projektInfo,
     required this.alleAnlaeg,
     required this.alleForslag,
     required this.elPris,
     required this.varmePris,
-  }) : super(key: key);
+  });
 
   @override
   State<RapportPreview> createState() => _RapportPreviewState();
@@ -39,7 +36,7 @@ class RapportPreview extends StatefulWidget {
 class _RapportPreviewState extends State<RapportPreview> {
   bool _isLoading = true;
   String? _errorMessage;
-  String _statusTekst = "Generer rapport";
+  final String _statusTekst = "Generer rapport";
   Uint8List? _kundePdf;
   Uint8List? _tekniskPdf;
   bool _visTeknikPdf = false;

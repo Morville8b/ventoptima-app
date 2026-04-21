@@ -3,7 +3,6 @@ import 'filter_resultat.dart';
 import 'anlaegs_data.dart';
 import 'dart:math' as math;
 import 'generel_projekt_info.dart';
-import 'dart:io';
 
 class FilterResultatSkarm extends StatelessWidget {
   final AnlaegsData anlaeg;
@@ -148,7 +147,7 @@ class FilterResultatSkarm extends StatelessWidget {
     }
 
     if (decimalPart.isNotEmpty) {
-      return formattedInteger + ',' + decimalPart;
+      return '$formattedInteger,$decimalPart';
     } else {
       return formattedInteger;
     }
@@ -157,12 +156,9 @@ class FilterResultatSkarm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 🔹 Før vi laver nogen beregning, skal vi sikre at alle nødvendige data er til stede
-    if (anlaeg.luftInd == null ||
-        anlaeg.luftUd == null ||
-        anlaeg.driftstimer == null ||
+    if (anlaeg.driftstimer == null ||
         anlaeg.virkningsgradInd == null ||
         anlaeg.virkningsgradUd == null ||
-        anlaeg.elpris == null ||
         anlaeg.filterValg == null) {
       return Scaffold(
         appBar: AppBar(
@@ -181,8 +177,8 @@ class FilterResultatSkarm extends StatelessWidget {
     }
 
     // 🔹 Brug de faktiske værdier fra anlaeg (nu garanteret til stede)
-    final double luftIndTotal = anlaeg.luftInd!;
-    final double luftUdTotal = anlaeg.luftUd!;
+    final double luftIndTotal = anlaeg.luftInd;
+    final double luftUdTotal = anlaeg.luftUd;
     final double driftstimerAar = anlaeg.driftstimer!;
     final double virkningsgradIndPct = anlaeg.virkningsgradInd!;
     final double virkningsgradUdPct = anlaeg.virkningsgradUd!;
@@ -208,7 +204,7 @@ class FilterResultatSkarm extends StatelessWidget {
       filterFoerUd: anlaeg.filterValg?.filterFoerUd,
     );
 
-    final bool erTomtResultat = anlaeg.filterValg == null || resultat == null;
+    final bool erTomtResultat = anlaeg.filterValg == null;
 
     // 🔹 Luft per filter
     final double luftPerFilterInd = luftIndTotal / (totalFiltreInd > 0 ? totalFiltreInd : 1);

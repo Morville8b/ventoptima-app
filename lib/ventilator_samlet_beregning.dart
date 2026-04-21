@@ -2,11 +2,8 @@ import 'package:ventoptima/ebmpapst.dart' as ebmpapst;
 import 'package:ventoptima/novenco.dart' as novenco;
 import 'package:ventoptima/ziehlabegg.dart' as ziehlabegg;
 import 'package:ventoptima/ebmpapst_priser.dart';
-import 'package:ventoptima/novenco_priser.dart';
 import 'package:ventoptima/ziehlabegg_priser.dart';
-import 'base_oekonomi_resultat.dart';
 import 'package:ventoptima/afdelingsdata.dart' as afdelingsdata;
-import 'package:ventoptima/beregning_varmegenvinding_optimering.dart';
 import 'package:ventoptima/beregning_varmeforbrug.dart';
 import 'package:ventoptima/generel_projekt_info.dart';
 

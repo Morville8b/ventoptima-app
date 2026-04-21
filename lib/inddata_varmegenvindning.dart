@@ -119,7 +119,7 @@ class VarmegenvindingSektion extends StatelessWidget {
             subtitle: Text('Beregn ud fra: ${beregnUdFraIndblaesning ? 'Indblæsningstemperatur' : 'Afkasttemperatur'}'),
             value: beregnUdFraIndblaesning,
             onChanged: visBeregningsMetode ? onMethodChanged : null,
-            activeColor: const Color(0xFF34E0A1),
+            activeThumbColor: const Color(0xFF34E0A1),
             inactiveTrackColor: const Color(0xFF34E0A1),
           ),
           Padding(

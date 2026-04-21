@@ -37,7 +37,7 @@ class RapportFilter {
       filterFoerUd: anlaeg.filterValg?.filterFoerUd,
     );
 
-    if (anlaeg.filterValg == null || resultat == null) {
+    if (anlaeg.filterValg == null) {
       return sider;
     }
 

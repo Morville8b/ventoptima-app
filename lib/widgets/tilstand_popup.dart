@@ -95,7 +95,7 @@ Future<String?> visTilstandsvurderingPopup(BuildContext context) async {
                             color: getTilstandsfarve(valgtTilstand),
                           ),
                         ),
-                        value: valgtTilstand,
+                        initialValue: valgtTilstand,
                         items: const [
                           DropdownMenuItem(
                             value: '1',

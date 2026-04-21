@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class OpdaterAppDialog extends StatefulWidget {
-  const OpdaterAppDialog({Key? key}) : super(key: key);
+  const OpdaterAppDialog({super.key});
 
   @override
   State<OpdaterAppDialog> createState() => _OpdaterAppDialogState();

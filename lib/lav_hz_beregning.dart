@@ -127,13 +127,12 @@ class BeregnVedLavHzWidgetState extends State<BeregnVedLavHzWidget> {
           ? parsedLuft
           : (widget.luftInd > 0 ? widget.luftInd : null); // widget.luftInd er non-null
 
-    final double? statiskTrykInd = widget.statiskTrykInd;
+    final double statiskTrykInd = widget.statiskTrykInd;
 
     print('📥 parsedLuft = $parsedLuft');
     print('📊 Beregning med: luftInd = $luftInd, statiskTrykInd = $statiskTrykInd, hzDrift = $hzDrift, hzMax = $hzMax');
 
-    if (luftInd != null && luftInd > 0 &&
-                statiskTrykInd != null && statiskTrykInd > 0 &&
+    if (luftInd != null && luftInd > 0 && statiskTrykInd > 0 &&
                 hzDrift != null && hzDrift > 0 &&
                 hzMax != null && hzMax > hzDrift) {
 
@@ -146,7 +145,7 @@ class BeregnVedLavHzWidgetState extends State<BeregnVedLavHzWidget> {
         luftIndMax = luftVedMaxHz;
         trykFoerIndMax = 0;
         trykEfterIndMax = trykVedMaxHz;
-        visNoteInd = hzDrift! < 50;
+        visNoteInd = hzDrift < 50;
 
         _luftIndController.text = luftVedMaxHz.toStringAsFixed(0);
         _trykFoerIndController.text = '0';
@@ -184,15 +183,14 @@ class BeregnVedLavHzWidgetState extends State<BeregnVedLavHzWidget> {
     print('📊 Beregning med: luftUd = $luftUd, statiskTrykUd = statiskTrykUd, hzDrift = $hzDrift, hzMax = $hzMax');
 
     // 🔹 Tag tryk fra widget
-    final double? statiskTrykUd = widget.statiskTrykUd;
+    final double statiskTrykUd = widget.statiskTrykUd;
 
     // 🔹 Debug info
     print('📥 parsedLuft = $parsedLuft');
     print('📊 Beregning med: luftUd = $luftUd, statiskTrykUd = $statiskTrykUd, hzDrift = $hzDrift, hzMax = $hzMax');
 
     // 🔹 Udfør beregning hvis alle værdier er valide
-    if (luftUd != null && luftUd > 0 &&
-        statiskTrykUd != null && statiskTrykUd > 0 &&
+    if (luftUd != null && luftUd > 0 && statiskTrykUd > 0 &&
         hzDrift != null && hzDrift > 0 &&
         hzMax != null && hzMax > hzDrift) {
 
@@ -205,7 +203,7 @@ class BeregnVedLavHzWidgetState extends State<BeregnVedLavHzWidget> {
         luftUdMax = luftVedMaxHz;
         trykFoerUdMax = 0;
         trykEfterUdMax = trykVedMaxHz;
-        visNoteUd = hzDrift! < 50;
+        visNoteUd = hzDrift < 50;
 
         _luftUdController.text = luftVedMaxHz.toStringAsFixed(0);
         _trykFoerUdController.text = '0';
@@ -262,9 +260,9 @@ class BeregnVedLavHzWidgetState extends State<BeregnVedLavHzWidget> {
                     if (val) beregnInd();
                   });
                 },
-                activeColor: const Color(0xFF34E0A1),
+                activeThumbColor: const Color(0xFF34E0A1),
                 activeTrackColor: const Color(0xFF34E0A1),
-                thumbColor: MaterialStateProperty.resolveWith(
+                thumbColor: WidgetStateProperty.resolveWith(
                       (states) => const Color(0xFF4A4A4A),
                 ),
               ),
@@ -349,9 +347,9 @@ class BeregnVedLavHzWidgetState extends State<BeregnVedLavHzWidget> {
                     if (val) beregnUd();
                   });
                 },
-                activeColor: const Color(0xFF34E0A1),
+                activeThumbColor: const Color(0xFF34E0A1),
                 activeTrackColor: const Color(0xFF34E0A1),
-                thumbColor: MaterialStateProperty.resolveWith(
+                thumbColor: WidgetStateProperty.resolveWith(
                       (states) => const Color(0xFF4A4A4A),
                 ),
               ),

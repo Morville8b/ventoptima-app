@@ -12,15 +12,11 @@ import 'ebmpapst.dart';
 import 'package:ventoptima/widgets/vis_virkningsgrad_advarsel.dart';
 import 'package:ventoptima/widgets/kammeropmaaling.dart';
 import 'package:ventoptima/widgets/tilstand_popup.dart';
-import 'anlaegs_oversigt_skarm.dart'; // eller hvad filnavnet hedder
+// eller hvad filnavnet hedder
 import 'ebmpapst.dart' as ebmpapst;
 import 'package:ventoptima/ventilator_samlet_beregning.dart';
 import 'beregning_varmeforbrug.dart';
-import 'besparelseforslag_skarm.dart';
-import 'beregning_varmegenvinding_optimering.dart';
-import 'filter_skarm.dart';
 import 'filter_resultat.dart';
-import 'filter_resultat_skarm.dart';
 
 enum VarmegenvindingType {
     krydsveksler,
@@ -64,7 +60,7 @@ class MaaledataSkarm extends StatefulWidget {
     final double? tilbagebetalingstid;
     final String? eksisterendeVarenummerInd;
     final String? eksisterendeVarenummerUd;
-    MaaledataSkarm({
+    const MaaledataSkarm({
         super.key,
         required this.forslag,
         required this.projektInfo,
@@ -121,7 +117,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
 
     Widget _dropdownVarmegenvindingType() {
         return DropdownButtonFormField<VarmegenvindingType>(
-            value: _valgtVarmegenvindingstype,
+            initialValue: _valgtVarmegenvindingstype,
             decoration: const InputDecoration(
                 labelText: 'Vælg varmegenvindingstype',
                 border: OutlineInputBorder(),
@@ -293,7 +289,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                                     labelText: "Gammelt filter (indblæsning)",
                                                                     border: OutlineInputBorder(),
                                                                 ),
-                                                                value: valgtFilterFoerInd,
+                                                                initialValue: valgtFilterFoerInd,
                                                                 items: filterTyper.map((f) => DropdownMenuItem(value: f, child: Text(f))).toList(),
                                                                 onChanged: (val) => valgtFilterFoerInd = val,
                                                             ),
@@ -328,7 +324,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                                     labelText: "Gammelt filter (udsugning)",
                                                                     border: OutlineInputBorder(),
                                                                 ),
-                                                                value: valgtFilterFoerUd,
+                                                                initialValue: valgtFilterFoerUd,
                                                                 items: filterTyper.map((f) => DropdownMenuItem(value: f, child: Text(f))).toList(),
                                                                 onChanged: (val) => valgtFilterFoerUd = val,
                                                             ),
@@ -409,8 +405,8 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
         FocusScope.of(context).unfocus();
         await Future.delayed(const Duration(milliseconds: 50));
 
-        const Color _matchingGreen = Color(0xFF34E0A1);
-        const Color _matchingBlue = Color(0xFF006390);
+        const Color matchingGreen = Color(0xFF34E0A1);
+        const Color matchingBlue = Color(0xFF006390);
 
         // 🔹 Første popup: Er det remtrukne ventilatorer?
         final svarRemtrukket = await Navigator.of(context).push<bool>(
@@ -450,13 +446,13 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                             Container(
                                                 padding: const EdgeInsets.all(16),
                                                 decoration: BoxDecoration(
-                                                    color: _matchingGreen.withOpacity(0.1),
+                                                    color: matchingGreen.withOpacity(0.1),
                                                     shape: BoxShape.circle,
                                                 ),
                                                 child: const Icon(
                                                     Icons.settings,
                                                     size: 40,
-                                                    color: _matchingBlue,
+                                                    color: matchingBlue,
                                                 ),
                                             ),
                                             const SizedBox(height: 16),
@@ -465,7 +461,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                 style: TextStyle(
                                                     fontSize: 20,
                                                     fontWeight: FontWeight.bold,
-                                                    color: _matchingBlue,
+                                                    color: matchingBlue,
                                                 ),
                                                 textAlign: TextAlign.center,
                                             ),
@@ -486,7 +482,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                             onPressed: () => Navigator.pop(context, false),
                                                             style: OutlinedButton.styleFrom(
                                                                 padding: const EdgeInsets.symmetric(vertical: 16),
-                                                                side: const BorderSide(color: _matchingGreen, width: 2),
+                                                                side: const BorderSide(color: matchingGreen, width: 2),
                                                                 shape: RoundedRectangleBorder(
                                                                     borderRadius: BorderRadius.circular(12),
                                                                 ),
@@ -494,7 +490,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                             child: const Text(
                                                                 'Nej',
                                                                 style: TextStyle(
-                                                                    color: _matchingBlue,
+                                                                    color: matchingBlue,
                                                                     fontSize: 16,
                                                                     fontWeight: FontWeight.bold,
                                                                 ),
@@ -506,7 +502,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                         child: ElevatedButton(
                                                             onPressed: () => Navigator.pop(context, true),
                                                             style: ElevatedButton.styleFrom(
-                                                                backgroundColor: _matchingGreen,
+                                                                backgroundColor: matchingGreen,
                                                                 padding: const EdgeInsets.symmetric(vertical: 16),
                                                                 shape: RoundedRectangleBorder(
                                                                     borderRadius: BorderRadius.circular(12),
@@ -516,7 +512,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                             child: const Text(
                                                                 'Ja',
                                                                 style: TextStyle(
-                                                                    color: _matchingBlue,
+                                                                    color: matchingBlue,
                                                                     fontSize: 16,
                                                                     fontWeight: FontWeight.bold,
                                                                 ),
@@ -576,13 +572,13 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                             Container(
                                                 padding: const EdgeInsets.all(16),
                                                 decoration: BoxDecoration(
-                                                    color: _matchingGreen.withOpacity(0.1),
+                                                    color: matchingGreen.withOpacity(0.1),
                                                     shape: BoxShape.circle,
                                                 ),
                                                 child: const Icon(
                                                     Icons.build,
                                                     size: 40,
-                                                    color: _matchingBlue,
+                                                    color: matchingBlue,
                                                 ),
                                             ),
                                             const SizedBox(height: 16),
@@ -591,7 +587,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                 style: TextStyle(
                                                     fontSize: 20,
                                                     fontWeight: FontWeight.bold,
-                                                    color: _matchingBlue,
+                                                    color: matchingBlue,
                                                 ),
                                                 textAlign: TextAlign.center,
                                             ),
@@ -612,7 +608,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                             onPressed: () => Navigator.pop(context, false),
                                                             style: OutlinedButton.styleFrom(
                                                                 padding: const EdgeInsets.symmetric(vertical: 16),
-                                                                side: const BorderSide(color: _matchingGreen, width: 2),
+                                                                side: const BorderSide(color: matchingGreen, width: 2),
                                                                 shape: RoundedRectangleBorder(
                                                                     borderRadius: BorderRadius.circular(12),
                                                                 ),
@@ -620,7 +616,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                             child: const Text(
                                                                 'Nej',
                                                                 style: TextStyle(
-                                                                    color: _matchingBlue,
+                                                                    color: matchingBlue,
                                                                     fontSize: 16,
                                                                     fontWeight: FontWeight.bold,
                                                                 ),
@@ -632,7 +628,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                         child: ElevatedButton(
                                                             onPressed: () => Navigator.pop(context, true),
                                                             style: ElevatedButton.styleFrom(
-                                                                backgroundColor: _matchingGreen,
+                                                                backgroundColor: matchingGreen,
                                                                 padding: const EdgeInsets.symmetric(vertical: 16),
                                                                 shape: RoundedRectangleBorder(
                                                                     borderRadius: BorderRadius.circular(12),
@@ -642,7 +638,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                             child: const Text(
                                                                 'Ja',
                                                                 style: TextStyle(
-                                                                    color: _matchingBlue,
+                                                                    color: matchingBlue,
                                                                     fontSize: 16,
                                                                     fontWeight: FontWeight.bold,
                                                                 ),
@@ -677,17 +673,17 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
 
     // 🟢 POPUP 1: Spørg om manuel prisindtastning
     Future<bool?> visPrisIndtastningValg(BuildContext context) async {
-        const Color _matchingGreen = Color(0xFF34E0A1);
-        const Color _matchingBlue  = Color(0xFF006390);
+        const Color matchingGreen = Color(0xFF34E0A1);
+        const Color matchingBlue  = Color(0xFF006390);
 
         return await showDialog<bool>(
             context: context,
             barrierDismissible: false,
             builder: (context) => AlertDialog(
-                icon: const Icon(Icons.edit, color: _matchingBlue, size: 50),
+                icon: const Icon(Icons.edit, color: matchingBlue, size: 50),
                 title: const Text(
                     'Prisindtastning',
-                    style: TextStyle(color: _matchingBlue, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: matchingBlue, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                 ),
                 content: const Text(
@@ -704,7 +700,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                 child: ElevatedButton(
                                     onPressed: () => Navigator.pop(context, false),
                                     style: ElevatedButton.styleFrom(
-                                        backgroundColor: _matchingGreen,
+                                        backgroundColor: matchingGreen,
                                         padding: const EdgeInsets.symmetric(vertical: 16),
                                         shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(12),
@@ -714,7 +710,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                     child: const Text(
                                         'Brug standard løsning',
                                         style: TextStyle(
-                                            color: _matchingBlue,
+                                            color: matchingBlue,
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                         ),
@@ -730,7 +726,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                     onPressed: () => Navigator.pop(context, true),
                                     style: OutlinedButton.styleFrom(
                                         padding: const EdgeInsets.symmetric(vertical: 16),
-                                        side: const BorderSide(color: _matchingGreen, width: 2),
+                                        side: const BorderSide(color: matchingGreen, width: 2),
                                         shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(12),
                                         ),
@@ -738,7 +734,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                     child: const Text(
                                         'Ønsker selv at indtaste pris',
                                         style: TextStyle(
-                                            color: _matchingBlue,
+                                            color: matchingBlue,
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                         ),
@@ -755,18 +751,18 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
 
 // 🟢 POPUP 2: Vælg udskiftningstype
     Future<String?> visUdskiftningstype(BuildContext context) async {
-        const Color _matchingGreen = Color(0xFF34E0A1);
-        const Color _matchingBlue  = Color(0xFF006390);
+        const Color matchingGreen = Color(0xFF34E0A1);
+        const Color matchingBlue  = Color(0xFF006390);
 
         return await showDialog<String>(
             context: context,
             barrierDismissible: false,
             builder: (context) => AlertDialog(
-                icon: const Icon(Icons.compare_arrows, color: _matchingBlue, size: 50),
+                icon: const Icon(Icons.compare_arrows, color: matchingBlue, size: 50),
                 title: const Text(
                     'Udskiftningstype',
                     style: TextStyle(
-                        color: _matchingBlue,
+                        color: matchingBlue,
                         fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
@@ -786,7 +782,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                 child: ElevatedButton(
                                     onPressed: () => Navigator.pop(context, 'ventilatorer'),
                                     style: ElevatedButton.styleFrom(
-                                        backgroundColor: _matchingGreen,
+                                        backgroundColor: matchingGreen,
                                         elevation: 0,
                                         padding: const EdgeInsets.symmetric(vertical: 16),
                                         shape: RoundedRectangleBorder(
@@ -796,7 +792,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                     child: const Text(
                                         'Udskiftning af ventilatorer',
                                         style: TextStyle(
-                                            color: _matchingBlue,
+                                            color: matchingBlue,
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                         ),
@@ -814,7 +810,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                     style: OutlinedButton.styleFrom(
                                         padding: const EdgeInsets.symmetric(vertical: 16),
                                         side: const BorderSide(
-                                            color: _matchingGreen,
+                                            color: matchingGreen,
                                             width: 2,
                                         ),
                                         shape: RoundedRectangleBorder(
@@ -824,7 +820,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                     child: const Text(
                                         'Udskiftning af hele anlæg',
                                         style: TextStyle(
-                                            color: _matchingBlue,
+                                            color: matchingBlue,
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                         ),
@@ -1380,8 +1376,8 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
     }
     // ✅ NY FUNKTION: VIS INTERN KOMMENTAR DIALOG
     Future<String?> visInternKommentarDialog(BuildContext context) async {
-        const Color _matchingGreen = Color(0xFF34E0A1);
-        const Color _matchingBlue = Color(0xFF006390);
+        const Color matchingGreen = Color(0xFF34E0A1);
+        const Color matchingBlue = Color(0xFF006390);
 
         final kommentarController = TextEditingController();
 
@@ -1426,13 +1422,13 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                             Container(
                                                 padding: const EdgeInsets.all(16),
                                                 decoration: BoxDecoration(
-                                                    color: _matchingGreen.withOpacity(0.1),
+                                                    color: matchingGreen.withOpacity(0.1),
                                                     shape: BoxShape.circle,
                                                 ),
                                                 child: const Icon(
                                                     Icons.note_add,
                                                     size: 40,
-                                                    color: _matchingBlue,
+                                                    color: matchingBlue,
                                                 ),
                                             ),
                                             const SizedBox(height: 16),
@@ -1443,7 +1439,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                 style: TextStyle(
                                                     fontSize: 20,
                                                     fontWeight: FontWeight.bold,
-                                                    color: _matchingBlue,
+                                                    color: matchingBlue,
                                                 ),
                                                 textAlign: TextAlign.center,
                                             ),
@@ -1470,11 +1466,11 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                     hintText: 'Skriv dine interne noter her...',
                                                     border: OutlineInputBorder(
                                                         borderRadius: BorderRadius.circular(12),
-                                                        borderSide: const BorderSide(color: _matchingGreen),
+                                                        borderSide: const BorderSide(color: matchingGreen),
                                                     ),
                                                     focusedBorder: OutlineInputBorder(
                                                         borderRadius: BorderRadius.circular(12),
-                                                        borderSide: const BorderSide(color: _matchingGreen, width: 2),
+                                                        borderSide: const BorderSide(color: matchingGreen, width: 2),
                                                     ),
                                                     contentPadding: const EdgeInsets.all(14),
                                                 ),
@@ -1490,7 +1486,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                             onPressed: () => Navigator.pop(context, null),
                                                             style: OutlinedButton.styleFrom(
                                                                 padding: const EdgeInsets.symmetric(vertical: 16),
-                                                                side: const BorderSide(color: _matchingGreen, width: 2),
+                                                                side: const BorderSide(color: matchingGreen, width: 2),
                                                                 shape: RoundedRectangleBorder(
                                                                     borderRadius: BorderRadius.circular(12),
                                                                 ),
@@ -1498,7 +1494,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                             child: const Text(
                                                                 'Spring over',
                                                                 style: TextStyle(
-                                                                    color: _matchingBlue,
+                                                                    color: matchingBlue,
                                                                     fontSize: 16,
                                                                     fontWeight: FontWeight.bold,
                                                                 ),
@@ -1513,7 +1509,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                                 Navigator.pop(context, kommentar.isNotEmpty ? kommentar : null);
                                                             },
                                                             style: ElevatedButton.styleFrom(
-                                                                backgroundColor: _matchingGreen,
+                                                                backgroundColor: matchingGreen,
                                                                 padding: const EdgeInsets.symmetric(vertical: 16),
                                                                 shape: RoundedRectangleBorder(
                                                                     borderRadius: BorderRadius.circular(12),
@@ -1523,7 +1519,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                                             child: const Text(
                                                                 'Gem',
                                                                 style: TextStyle(
-                                                                    color: _matchingBlue,
+                                                                    color: matchingBlue,
                                                                     fontSize: 16,
                                                                     fontWeight: FontWeight.bold,
                                                                 ),
@@ -1553,7 +1549,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
     bool _visEffektBeregningUd = false;
     bool _visVarmegenvinding = false;
     bool _beregnUdFraIndblaesning = true;
-    bool _beregnetInd = false;
+    final bool _beregnetInd = false;
     String _valgtAnlaegstype = 'Ventilationsanlæg';
 
     double? luftUdMax, trykFoerUdMax, trykEfterUdMax;
@@ -1652,7 +1648,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
         FocusScope.of(context).unfocus();
         await Future.delayed(const Duration(milliseconds: 100));
 
-        final bool? vilFortsaette = await visDokumentationsDialog(context, valgtTilstand);
+        final bool vilFortsaette = await visDokumentationsDialog(context, valgtTilstand);
         final double? remUdskiftningPris = await visRemtrukketPopup(context, _luftMaaltInd);
 
         final double elpris = widget.projektInfo.elPris;
@@ -2365,7 +2361,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
 
                                     value: _visVarmegenvinding,
                                     onChanged: (val) => setState(() => _visVarmegenvinding = val),
-                                    activeColor: _matchingGreen, // Farven HEX #34E0A1
+                                    activeThumbColor: _matchingGreen, // Farven HEX #34E0A1
                                     inactiveTrackColor: _matchingGreen, // Farven HEX #34E0A1
                                 ),
                                 if (_visVarmegenvinding) ...[
@@ -2417,12 +2413,12 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
                                             subtitle: const Text('Anlægget har både recirkulering og varmeveksler'),
                                             value: _kombinerMedVarmegenvinding,
                                             onChanged: (val) => setState(() => _kombinerMedVarmegenvinding = val),
-                                            activeColor: _matchingGreen,
+                                            activeThumbColor: _matchingGreen,
                                             ),
                                             if (_kombinerMedVarmegenvinding) ...[
                                             const SizedBox(height: 12),
                                             DropdownButtonFormField<VarmegenvindingType>(
-                                            value: _kombineretVarmegenvindingstype,
+                                            initialValue: _kombineretVarmegenvindingstype,
                                             decoration: InputDecoration(
                                             labelText: 'Varmegenvindingstype',
                                             border: OutlineInputBorder(
@@ -2959,7 +2955,7 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
 
                                                 // 🔹 Skal brugeren tilføje billeder?
                                                 await Future.delayed(const Duration(milliseconds: 100));
-                                                final bool? vilTilfoejeBilleder =
+                                                final bool vilTilfoejeBilleder =
                                                 await visDokumentationsDialog(context, valgtTilstand);
 
                                                 if (vilTilfoejeBilleder == true) {

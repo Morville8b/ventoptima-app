@@ -37,10 +37,10 @@ class _MaaledataSkarmState extends State<MaaledataSkarm> {
   // 🔥 Manglende controllers fra fejl-log
   final _aarsVirkningsgradCtrl = TextEditingController();
   final _varmePrisCtrl = TextEditingController();
-  String _valgtAnlaegstype = "Ventilationsanlæg";
-  String _valgtTilstand = '1';
+  final String _valgtAnlaegstype = "Ventilationsanlæg";
+  final String _valgtTilstand = '1';
 
-  bool _beregnUdFraKVaerdi = false;
+  final bool _beregnUdFraKVaerdi = false;
 
   @override
   void dispose() {
